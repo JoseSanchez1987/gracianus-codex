@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gracianus: Codex Navigator</title>
+  <meta name="description" content="Plataforma de consulta y búsqueda de textos jurídico-canónicos. Accede al Código de Derecho Canónico, documentos pontificios y recursos académicos.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Mobile Header -->
+  <header class="mobile-header" id="mobileHeader">
+    <button class="hamburger" id="hamburgerBtn" aria-label="Abrir menú de navegación">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="mobile-brand">
+      <span class="mobile-brand-icon">⚖</span>
+      <span class="mobile-brand-text">Ius Canonicum</span>
+    </div>
+  </header>
+
+  <!-- Overlay for mobile sidebar -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar" id="sidebar" aria-label="Navegación principal">
+    <div class="sidebar-brand">
+      <div class="brand-icon">⚖</div>
+      <h1 class="brand-title">Gracianus</h1>
+      <p class="brand-subtitle">CODEX NAVIGATOR</p>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <ul class="sidebar-nav" role="list">
+      <li>
+        <a href="#inicio" class="nav-link active" data-section="inicio" id="nav-inicio">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <span>Inicio</span>
+        </a>
+      </li>
+      <li>
+        <a href="#documentos" class="nav-link" data-section="documentos" id="nav-documentos">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+          <span>Documentos Jur&#237;dicos</span>
+        </a>
+      </li>
+      <li>
+        <a href="#informacion" class="nav-link" data-section="informacion" id="nav-informacion">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <span>Información del Proyecto</span>
+        </a>
+      </li>
+      <li>
+        <a href="#contacto" class="nav-link" data-section="contacto" id="nav-contacto">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          <span>Contacto</span>
+        </a>
+      </li>
+      <!-- Colección Temática (Oculto temporalmente)
+      <li>
+        <a href="#coleccion" class="nav-link" data-section="coleccion" id="nav-coleccion">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+          </svg>
+          <span>Colecci&#243;n Tem&#225;tica</span>
+        </a>
+      </li>
+      -->
+    </ul>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-divider"></div>
+      <p class="footer-text">© 2026 Gracianus: Codex Navigator</p>
+      <p class="footer-text footer-text--small">Todos los derechos reservados</p>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="main-content" id="mainContent">
+
+    <!-- Section: Inicio -->
+    <section class="content-section active" id="section-inicio">
+      <div class="hero">
+        <div class="hero-badge">Plataforma de Consulta</div>
+        <h2 class="hero-title">Derecho Canónico<br><span class="hero-title--accent">al alcance de todos</span></h2>
+        <p class="hero-description">
+          Busca entre cánones, documentos pontificios, decretos conciliares y textos académicos de la tradición jurídico-canónica.
+        </p>
+
+        <!-- Search Bar — Main Protagonist -->
+        <div class="search-container" id="searchContainer">
+          <div class="search-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input
+              type="search"
+              class="search-input"
+              id="searchInput"
+              placeholder="Buscar cánones, documentos, decretos…"
+              aria-label="Buscar en la base de datos jurídico-canónica"
+              autocomplete="off"
+            >
+            <button class="search-btn" id="searchBtn" aria-label="Ejecutar búsqueda">
+              Buscar
+            </button>
+          </div>
+          <div class="search-suggestions">
+            <span class="suggestion-label">Sugerencias:</span>
+            <button class="suggestion-tag" data-query="leyes eclesiásticas">leyes eclesiásticas</button>
+            <button class="suggestion-tag" data-query="excomunión">excomunión</button>
+            <button class="suggestion-tag" data-query="costumbre">costumbre</button>
+            <button class="suggestion-tag" data-query="penas">penas</button>
+            <button class="suggestion-tag" data-query="dispensa">dispensa</button>
+            <button class="suggestion-tag" data-query="1331">Canon 1331</button>
+          </div>
+
+          <!-- Live Search Results Dropdown -->
+          <div class="search-results" id="searchResults" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <!-- Canon Detail Viewer (hidden by default) -->
+      <div class="canon-detail" id="canonDetail" style="display:none;">
+        <button class="canon-detail-back" id="canonDetailBack" aria-label="Volver a la estructura">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          <span>Volver</span>
+        </button>
+        <div class="canon-detail-header">
+          <span class="canon-detail-badge" id="canonDetailBadge"></span>
+          <h3 class="canon-detail-title" id="canonDetailTitle"></h3>
+        </div>
+        <div class="canon-detail-meta" id="canonDetailMeta"></div>
+        <div class="canon-detail-body" id="canonDetailBody"></div>
+      </div>
+
+      <!-- Accordion: Hierarchical Structure of CIC -->
+      <div class="accordion-section" id="accordionSection">
+        <div class="accordion-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+          <h3 class="accordion-section-title">Estructura del Código de Derecho Canónico</h3>
+        </div>
+        <div class="accordion-container" id="accordionContainer">
+          <!-- Populated dynamically from data.json -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Información del Proyecto -->
+    <section class="content-section" id="section-informacion">
+      <div class="section-header">
+        <h2 class="section-title">Información del Proyecto</h2>
+        <div class="section-rule"></div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <h3 class="info-card-title">Misión</h3>
+          <p class="text-body">
+            Proporcionar un buscador multiplataforma, rápido y fácil de usar del Código de Derecho Canónico, garantizando su disponibilidad en cualquier tipo de dispositivo. El propósito central es facilitar el estudio y la consulta ágil de los cánones a estudiantes, pastores y fieles, extendiendo también su utilidad técnica a los profesionales del derecho en su ejercicio diario.
+          </p>
+        </div>
+        <div class="info-card">
+          <h3 class="info-card-title">Visión</h3>
+          <p class="text-body">
+            Consolidar un entorno digital moderno que reafirme que el Derecho Canónico es una herramienta fundamental para la vida y el orden de la Iglesia. Aspiramos a ser el recurso tecnológico de referencia en la canonística, demostrando que la profundidad de la tradición jurídica y académica puede integrarse en sistemas informáticos ligeros, independientes y altamente eficientes.
+          </p>
+        </div>
+      </div>
+
+      <div class="text-section">
+        <h3 class="text-section-title">Sobre el Proyecto</h3>
+        <p class="text-body">
+          Esta aplicación, desarrollada por el Pbro. José Guadalupe Sánchez Cornejo, sacerdote mexicano incardinado en la Diócesis de Matamoros-Reynosa y actualmente estudiante de posgrado en Derecho Canónico en la Universidad de Navarra en España, nace con una profunda vocación de servicio.
+        </p>
+        <p class="text-body">
+          El proyecto se sostiene de manera independiente, operando de forma autónoma sin ningún tipo de financiación institucional o comercial. Por ello, si deseas colaborar con esta labor, la mejor manera de hacerlo es compartiendo la aplicación con otras personas e instituciones que puedan beneficiarse de su uso.
+        </p>
+        <p class="text-body">
+          Asimismo, agradecemos de corazón cualquier donativo voluntario, el cual se destina íntegramente a mantener y mejorar esta herramienta para el beneficio de todos, asegurando que la infraestructura de los servidores permanezca accesible y libre de publicidad. En la sección de Contacto se detallan las modalidades disponibles para quienes deseen apoyar este esfuerzo.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section: Contacto -->
+    <section class="content-section" id="section-contacto">
+      <div class="section-header">
+        <h2 class="section-title">Contacto</h2>
+        <div class="section-rule"></div>
+      </div>
+
+      <div class="info-grid">
+        <!-- 1. Información de Contacto y Ubicación -->
+        <div class="info-card">
+          <h3 class="info-card-title">Información de Contacto y Ubicación</h3>
+          <ul class="contact-list">
+            <li class="contact-item">
+              <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <div class="contact-item__content">
+                <span class="contact-item__label">Correo electrónico</span>
+                <a href="mailto:gpesanchez87@gmail.com" class="contact-item__value contact-item__link">gpesanchez87@gmail.com</a>
+              </div>
+            </li>
+            <li class="contact-item">
+              <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+              <div class="contact-item__content">
+                <span class="contact-item__label">Teléfono / Móvil</span>
+                <a href="tel:+34655438010" class="contact-item__value contact-item__link">+34 655 438 010</a>
+              </div>
+            </li>
+            <li class="contact-item">
+              <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              <div class="contact-item__content">
+                <span class="contact-item__label">Ubicación</span>
+                <span class="contact-item__value">Universidad de Navarra, Pamplona, España</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 2 & 3. Apoyo al Proyecto y Botones de Donativo -->
+        <div class="info-card">
+          <h3 class="info-card-title">Apoyo al Proyecto</h3>
+          <p class="text-body">
+            Gracianus es un proyecto independiente y sin ánimo de lucro al servicio del estudio del Derecho Canónico. Toda colaboración voluntaria es bienvenida y se destina íntegramente al mantenimiento de la infraestructura de los servidores y a la mejora continua de la herramienta, manteniéndola libre y accesible para todos.
+          </p>
+          <div class="donation-actions">
+            <a href="https://ko-fi.com/joseguadalupesanchezcornejo"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="donation-btn donation-btn--kofi"
+               id="btn-donate-kofi">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" aria-hidden="true">
+                <path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.047 3.974-4.047 3.974s-2.8-2.521-4.047-3.974c-1.332-1.556-1.077-3.795.57-4.664 1.647-.869 3.477.531 3.477.531s1.83-1.4 3.477-.531c1.647.869 1.902 3.108.57 4.664zm8.683-1.748c-.463 2.449-2.551 2.385-2.551 2.385v-4.77s2.088-.064 2.551 2.385z"/>
+              </svg>
+              <span>Invítame a un café (Ko-fi)</span>
+            </a>
+            <a href="https://paypal.me/LupeSanchez87"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="donation-btn donation-btn--paypal"
+               id="btn-donate-paypal">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" aria-hidden="true">
+                <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.653h6.979c2.478 0 4.298.536 5.409 1.595 1.07 1.02 1.488 2.545 1.244 4.535-.615 5.01-3.69 7.64-9.14 7.64H7.99a.86.86 0 0 0-.85.73l-.064.37zM19.78 7.37c-.36-1.49-1.26-2.56-2.68-3.19A8.99 8.99 0 0 0 12.693 3.5H6.714a.78.78 0 0 0-.77.653L2.837 20.02a.641.641 0 0 0 .633.74h4.606l.87-5.5.027-.17a.86.86 0 0 1 .85-.73h2.213c4.717 0 7.38-2.277 7.91-6.59.083-.68.06-1.24-.166-1.4z"/>
+              </svg>
+              <span>Colabora vía PayPal</span>
+            </a>
+          </div>
+          <p class="donation-note">Agradecemos profundamente cualquier apoyo para sostener este proyecto independiente.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Documentos Jurídicos -->
+    <section class="content-section" id="section-documentos">
+      <div class="section-header">
+        <h2 class="section-title">Documentos Jur&#237;dicos</h2>
+        <div class="section-rule"></div>
+      </div>
+
+      <!-- Buscador de Praedicate Evangelium -->
+      <div class="pe-search-wrapper" id="peSearchWrapper">
+        <svg class="pe-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          type="search"
+          class="pe-search-input"
+          id="peSearchInput"
+          placeholder="Buscar dicasterio, norma o tema..."
+          autocomplete="off"
+          aria-label="Buscar en Praedicate Evangelium"
+        >
+      </div>
+
+      <!-- Resultados del buscador PE -->
+      <div class="pe-search-results" id="peSearchResults" aria-live="polite"></div>
+
+      <div class="resources-list" id="resourcesList">
+
+        <!-- Tarjeta destacada: Praedicate Evangelium -->
+        <div class="doc-card-featured" id="doc-praedicate-evangelium">
+          <div class="doc-card-featured__label">Constitución Apostólica</div>
+          <h3 class="doc-card-featured__title">Praedicate Evangelium</h3>
+          <p class="doc-card-featured__desc">
+            Constitución Apostólica sobre la Curia Romana y su servicio a la Iglesia en el mundo (2022).
+            Promulgada por el Papa Francisco, establece la nueva estructura y misión de la Curia al servicio
+            de la evangelización.
+          </p>
+          <div class="doc-card-featured__meta">
+            <span class="doc-card-featured__badge">Francisco · 19 marzo 2022</span>
+            <div class="doc-card-featured__actions">
+              <a href="./assets/documentos/praedicate_evangelium.pdf"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="doc-card-featured__btn doc-card-featured__btn--read"
+                 id="btn-read-praedicate">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/>
+                  <line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+                Leer en l&#237;nea
+              </a>
+              <a href="./assets/documentos/praedicate_evangelium.pdf"
+                 download="praedicate_evangelium.pdf"
+                 class="doc-card-featured__btn doc-card-featured__btn--download"
+                 id="btn-download-praedicate">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Descargar PDF
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta: Mitis Iudex Dominus Iesus -->
+        <div class="doc-card-featured" id="doc-mitis-iudex">
+          <div class="doc-card-featured__label">Carta Apostólica · Motu Proprio</div>
+          <h3 class="doc-card-featured__title">Mitis Iudex Dominus Iesus</h3>
+          <p class="doc-card-featured__desc">
+            Reforma del proceso canónico para las causas de declaración de nulidad del matrimonio
+            en el Código de Derecho Canónico (2015). Promulgado por el Papa Francisco, simplifica
+            y agiliza los procedimientos para la declaración de nulidad matrimonial.
+          </p>
+          <div class="doc-card-featured__meta">
+            <span class="doc-card-featured__badge">Francisco · 8 septiembre 2015</span>
+            <div class="doc-card-featured__actions">
+              <a href="./assets/documentos/mitis_iudex.pdf"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="doc-card-featured__btn doc-card-featured__btn--read"
+                 id="btn-read-mitis-iudex">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/>
+                  <line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+                Leer en l&#237;nea
+              </a>
+              <a href="./assets/documentos/mitis_iudex.pdf"
+                 download="mitis_iudex.pdf"
+                 class="doc-card-featured__btn doc-card-featured__btn--download"
+                 id="btn-download-mitis-iudex">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Descargar PDF
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta: Vos estis lux mundi -->
+        <div class="doc-card-featured" id="doc-vos-estis">
+          <div class="doc-card-featured__label">Motu Proprio</div>
+          <h3 class="doc-card-featured__title">Vos estis lux mundi</h3>
+          <p class="doc-card-featured__desc">
+            Normas a nivel universal para prevenir y combatir los delitos de abuso sexual y
+            garantizar la rendición de cuentas de los obispos y superiores religiosos (2019,
+            revisado 2023). Establece procedimientos claros para la denuncia y la investigación
+            de abusos cometidos por clérigos y miembros de institutos de vida consagrada.
+          </p>
+          <div class="doc-card-featured__meta">
+            <span class="doc-card-featured__badge">Francisco · 7 mayo 2019 · rev. 2023</span>
+            <div class="doc-card-featured__actions">
+              <a href="./assets/documentos/vos_estis_lux_mundi.pdf"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="doc-card-featured__btn doc-card-featured__btn--read"
+                 id="btn-read-vos-estis">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/>
+                  <line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+                Leer en l&#237;nea
+              </a>
+              <a href="./assets/documentos/vos_estis_lux_mundi.pdf"
+                 download="vos_estis_lux_mundi.pdf"
+                 class="doc-card-featured__btn doc-card-featured__btn--download"
+                 id="btn-download-vos-estis">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Descargar PDF
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <a href="#" class="resource-item" id="resource-cceo">
+          <div class="resource-meta">
+            <span class="resource-type">Código</span>
+            <h3 class="resource-title">Codex Canonum Ecclesiarum Orientalium</h3>
+            <p class="resource-desc">Código de Cánones de las Iglesias Orientales, promulgado en 1990.</p>
+          </div>
+          <svg class="resource-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </a>
+
+        <a href="#" class="resource-item" id="resource-lumen">
+          <div class="resource-meta">
+            <span class="resource-type">Constitución</span>
+            <h3 class="resource-title">Lumen Gentium</h3>
+            <p class="resource-desc">Constitución dogmática sobre la Iglesia del Concilio Vaticano II.</p>
+          </div>
+          <svg class="resource-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </a>
+
+        <a href="#" class="resource-item" id="resource-pastor">
+          <div class="resource-meta">
+            <span class="resource-type">Constitución Apostólica</span>
+            <h3 class="resource-title">Pastor Bonus</h3>
+            <p class="resource-desc">Constitución apostólica sobre la Curia Romana, promulgada por Juan Pablo II en 1988.</p>
+          </div>
+          <svg class="resource-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </a>
+
+        <a href="#" class="resource-item" id="resource-dignitas">
+          <div class="resource-meta">
+            <span class="resource-type">Motu Proprio</span>
+            <h3 class="resource-title">Mitis Iudex Dominus Iesus</h3>
+            <p class="resource-desc">Reforma del proceso canónico para las causas de nulidad matrimonial (2015).</p>
+          </div>
+          <svg class="resource-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </a>
+      </div>
+
+      <div class="text-section">
+        <h3 class="text-section-title">Bibliografía recomendada</h3>
+        <p class="text-body">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vitae gravida mauris. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec tincidunt, nunc vel posuere pharetra, elit odio dapibus sapien, a elementum risus eros vel metus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+        </p>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         Section: Colección Temática
+         ================================================================ -->
+    <section class="content-section" id="section-coleccion">
+
+      <!-- VISTA DE CUADRÍCULA -->
+      <div id="ct-grid-view">
+        <div class="section-header">
+          <h2 class="section-title">Colecci&#243;n Tem&#225;tica</h2>
+          <div class="section-rule"></div>
+          <p class="section-subtitle">40 temas de derecho can&#243;nico con video, podcast y documentaci&#243;n.</p>
+        </div>
+        <div class="ct-grid" id="ctGrid">
+          <!-- Cards rendered by JS -->
+        </div>
+      </div>
+
+      <!-- VISTA DE DETALLE (hidden by default) -->
+      <div id="ct-detail-view" class="ct-detail" style="display:none;">
+
+        <button class="ct-back-btn" id="ctBackBtn" aria-label="Volver al índice">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Volver al &#237;ndice
+        </button>
+
+        <div class="ct-detail-header">
+          <span class="ct-detail-num" id="ctDetailNum"></span>
+          <h2 class="ct-detail-title" id="ctDetailTitle"></h2>
+        </div>
+
+        <!-- Video YouTube -->
+        <div class="ct-media-block">
+          <div class="ct-media-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
+              <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+            </svg>
+            Video
+          </div>
+          <div class="ct-video-wrapper">
+            <iframe id="ctVideoFrame"
+              src=""
+              title="Video temático"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+              loading="lazy">
+            </iframe>
+          </div>
+        </div>
+
+        <!-- Audio Podcast -->
+        <div class="ct-media-block">
+          <div class="ct-media-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
+              <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+            </svg>
+            Podcast
+          </div>
+          <audio id="ctAudio" controls class="ct-audio" preload="none">
+            <source id="ctAudioSrc" src="" type="audio/mpeg">
+            Tu navegador no soporta el reproductor de audio.
+          </audio>
+        </div>
+
+        <!-- Botones PDF -->
+        <div class="ct-pdf-actions">
+          <a id="ctBtnRead" href="#" target="_blank" rel="noopener noreferrer"
+             class="doc-card-featured__btn doc-card-featured__btn--read">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+            Leer en l&#237;nea
+          </a>
+          <a id="ctBtnDownload" href="#" download
+             class="doc-card-featured__btn doc-card-featured__btn--download">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Descargar PDF
+          </a>
+        </div>
+
+      </div><!-- /ct-detail-view -->
+
+    </section><!-- /section-coleccion -->
+
+  </main>
+
+  <script src="data.js"></script>
+  <script src="pe_data.js"></script>
+  <script src="temas_data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
