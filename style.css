@@ -59,6 +59,10 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
 }
 
 html {
@@ -66,6 +70,10 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
 }
 
 body {
@@ -74,6 +82,32 @@ body {
   color: var(--color-text);
   line-height: 1.7;
   min-height: 100vh;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+p,
+span,
+a,
+li,
+h1, h2, h3, h4, h5, h6,
+article,
+section {
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+p {
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 /* --- Mobile Header --- */
@@ -559,7 +593,13 @@ body {
   line-height: 1.85;
   margin-bottom: 16px;
   text-align: justify;
-  hyphens: auto;
+  text-justify: inter-word;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .text-body:last-child {
@@ -1336,7 +1376,13 @@ mark {
   border-radius: var(--radius-lg);
   border-left: 4px solid var(--color-navy);
   text-align: justify;
-  hyphens: auto;
+  text-justify: inter-word;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 /* ===================================================================
