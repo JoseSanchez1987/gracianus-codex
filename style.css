@@ -1396,6 +1396,109 @@ mark {
   overflow-wrap: break-word;
 }
 
+/* --- Canon Detail Navigation Controls --- */
+.canon-detail-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.canon-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: var(--font-body);
+  color: var(--color-navy);
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-subtle);
+  user-select: none;
+}
+
+.canon-nav-btn:hover:not(:disabled) {
+  background: var(--color-bg-warm);
+  border-color: var(--color-navy);
+  color: var(--color-navy-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card);
+}
+
+.canon-nav-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.canon-nav-btn svg {
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.canon-nav-btn--prev:hover:not(:disabled) svg {
+  transform: translateX(-3px);
+}
+
+.canon-nav-btn--next:hover:not(:disabled) svg {
+  transform: translateX(3px);
+}
+
+.canon-nav-btn__info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.canon-nav-btn--next .canon-nav-btn__info {
+  text-align: right;
+}
+
+.canon-nav-btn__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-slate-muted);
+  line-height: 1.2;
+}
+
+.canon-nav-btn__target {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-navy-dark);
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.canon-nav-btn:disabled,
+.canon-nav-btn.is-disabled {
+  visibility: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+
+@media (max-width: 600px) {
+  .canon-detail-nav {
+    gap: 10px;
+  }
+
+  .canon-nav-btn {
+    flex: 1;
+    padding: 10px 12px;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .canon-nav-btn__target {
+    font-size: 0.85rem;
+  }
+}
+
 /* ===================================================================
    RESPONSIVE
    =================================================================== */

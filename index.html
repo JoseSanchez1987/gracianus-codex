@@ -187,6 +187,31 @@
         </div>
         <div class="canon-detail-meta" id="canonDetailMeta"></div>
         <div class="canon-detail-body" id="canonDetailBody"></div>
+
+        <!-- Canon Navigation Controls -->
+        <div class="canon-detail-nav" id="canonDetailNav">
+          <button class="canon-nav-btn canon-nav-btn--prev" id="canonNavPrev" aria-label="Canon anterior">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+              <line x1="19" y1="12" x2="5" y2="12"/>
+              <polyline points="12 19 5 12 12 5"/>
+            </svg>
+            <div class="canon-nav-btn__info">
+              <span class="canon-nav-btn__label">Anterior</span>
+              <span class="canon-nav-btn__target" id="canonNavPrevText"></span>
+            </div>
+          </button>
+
+          <button class="canon-nav-btn canon-nav-btn--next" id="canonNavNext" aria-label="Canon siguiente">
+            <div class="canon-nav-btn__info">
+              <span class="canon-nav-btn__label">Siguiente</span>
+              <span class="canon-nav-btn__target" id="canonNavNextText"></span>
+            </div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <!-- Accordion: Hierarchical Structure of CIC -->

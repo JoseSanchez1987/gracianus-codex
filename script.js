@@ -211,8 +211,49 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =====================================================================
-  // CANON DETAIL VIEWER
+  // CANON DETAIL VIEWER & SEQUENTIAL NAVIGATION
   // =====================================================================
+
+  function updateCanonNav(currentNumero) {
+    const prevBtn = document.getElementById('canonNavPrev');
+    const nextBtn = document.getElementById('canonNavNext');
+    const prevText = document.getElementById('canonNavPrevText');
+    const nextText = document.getElementById('canonNavNextText');
+
+    if (!prevBtn || !nextBtn) return;
+
+    const n = Number(currentNumero);
+    const prevNum = n - 1;
+    const nextNum = n + 1;
+
+    // Boundary check against actual canons in database
+    const prevCanon = prevNum >= 1 ? findCanon(prevNum) : null;
+    const nextCanon = findCanon(nextNum);
+
+    if (prevCanon) {
+      prevBtn.disabled = false;
+      prevBtn.classList.remove('is-disabled');
+      prevBtn.dataset.targetCanon = String(prevCanon.numero);
+      if (prevText) prevText.textContent = `Canon ${prevCanon.numero}`;
+    } else {
+      prevBtn.disabled = true;
+      prevBtn.classList.add('is-disabled');
+      delete prevBtn.dataset.targetCanon;
+      if (prevText) prevText.textContent = '';
+    }
+
+    if (nextCanon) {
+      nextBtn.disabled = false;
+      nextBtn.classList.remove('is-disabled');
+      nextBtn.dataset.targetCanon = String(nextCanon.numero);
+      if (nextText) nextText.textContent = `Canon ${nextCanon.numero}`;
+    } else {
+      nextBtn.disabled = true;
+      nextBtn.classList.add('is-disabled');
+      delete nextBtn.dataset.targetCanon;
+      if (nextText) nextText.textContent = '';
+    }
+  }
 
   function showCanonDetail(numero) {
     const canon = findCanon(numero);
@@ -232,6 +273,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Body text
     document.getElementById('canonDetailBody').textContent = canon.texto;
 
+    // Update navigation controls (Previous / Next)
+    updateCanonNav(canon.numero);
+
     // Show detail, hide accordion
     canonDetail.style.display = 'block';
     canonDetail.style.animation = 'none';
@@ -249,6 +293,47 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   canonDetailBack.addEventListener('click', hideCanonDetail);
+
+  const canonNavPrev = document.getElementById('canonNavPrev');
+  const canonNavNext = document.getElementById('canonNavNext');
+
+  if (canonNavPrev) {
+    canonNavPrev.addEventListener('click', () => {
+      const target = canonNavPrev.dataset.targetCanon;
+      if (target) {
+        showCanonDetail(parseInt(target, 10));
+      }
+    });
+  }
+
+  if (canonNavNext) {
+    canonNavNext.addEventListener('click', () => {
+      const target = canonNavNext.dataset.targetCanon;
+      if (target) {
+        showCanonDetail(parseInt(target, 10));
+      }
+    });
+  }
+
+  // Keyboard navigation for canon detail (Left / Right arrows)
+  document.addEventListener('keydown', (e) => {
+    if (!canonDetail || canonDetail.style.display === 'none') return;
+    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
+
+    if (e.key === 'ArrowLeft') {
+      const prevTarget = canonNavPrev && canonNavPrev.dataset.targetCanon;
+      if (prevTarget) {
+        e.preventDefault();
+        showCanonDetail(parseInt(prevTarget, 10));
+      }
+    } else if (e.key === 'ArrowRight') {
+      const nextTarget = canonNavNext && canonNavNext.dataset.targetCanon;
+      if (nextTarget) {
+        e.preventDefault();
+        showCanonDetail(parseInt(nextTarget, 10));
+      }
+    }
+  });
 
   function metaChip(type, text) {
     const icons = {
@@ -514,7 +599,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // =====================================================================
 
   function findCanon(numero) {
-    return dbData ? dbData.canones.find(c => c.numero === numero) : null;
+    if (!dbData || !dbData.canones) return null;
+    const n = typeof numero === 'number' ? numero : parseInt(numero, 10);
+    return dbData.canones.find(c => c.numero === n) || null;
   }
 
   function normalizeStr(str) {
