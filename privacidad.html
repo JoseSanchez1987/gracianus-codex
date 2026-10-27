@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Políticas de Privacidad — Gracianus: Codex Navigator</title>
+  <meta name="description" content="Políticas de privacidad y uso de contenido de la plataforma Gracianus: Codex Navigator.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Desactivar separación silábica con guiones en toda la interfaz */
+    *, *::before, *::after,
+    html, body, p, div, span, a, li, article, section,
+    .text-body, .canon-detail-body {
+      -webkit-hyphens: none !important;
+      -moz-hyphens: none !important;
+      -ms-hyphens: none !important;
+      hyphens: none !important;
+      word-break: normal !important;
+      overflow-wrap: break-word !important;
+    }
+    /* Justificación de texto tipo procesador de textos sin guiones */
+    p,
+    .text-body,
+    .canon-detail-body,
+    .info-card p {
+      text-align: justify !important;
+      text-justify: inter-word !important;
+    }
+
+    .privacy-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 860px;
+      margin-top: 24px;
+    }
+
+    .privacy-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      transition: box-shadow var(--transition-fast);
+    }
+
+    .privacy-card:hover {
+      box-shadow: 0 4px 16px rgba(44, 62, 90, 0.05);
+    }
+
+    .privacy-card__num {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-navy);
+      background: var(--color-accent-soft);
+      padding: 3px 10px;
+      border-radius: 100px;
+      margin-bottom: 10px;
+    }
+
+    .privacy-card__title {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--color-navy-dark);
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--color-navy);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-light);
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      margin-bottom: 24px;
+      transition: all var(--transition-fast);
+    }
+
+    .back-btn:hover {
+      background: var(--color-bg-warm);
+      border-color: var(--color-border);
+      color: var(--color-navy-dark);
+      transform: translateX(-2px);
+    }
+
+    .back-btn svg {
+      transition: transform var(--transition-fast);
+    }
+
+    .back-btn:hover svg {
+      transform: translateX(-3px);
+    }
+  </style>
+  <script defer src="https://joselinux-default-string.tail40fd36.ts.net/script.js" data-website-id="a5cb6a91-11a5-4714-b358-9ba608830fcd"></script>
+  <meta property="og:title" content="Políticas de Privacidad — Gracianus: Codex Navigator" />
+  <meta property="og:description" content="Políticas de Privacidad y Uso de Contenido - Gracianus Codex." />
+  <meta property="og:image" content="https://josesanchez1987.github.io/gracianus-codex/portada.jpg" />
+  <meta property="og:url" content="https://josesanchez1987.github.io/gracianus-codex/privacidad.html" />
+  <meta property="og:type" content="website" />
+</head>
+<body>
+
+  <!-- Mobile Header -->
+  <header class="mobile-header" id="mobileHeader">
+    <button class="hamburger" id="hamburgerBtn" aria-label="Abrir menú de navegación">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <a href="index.html" class="mobile-brand" style="text-decoration: none;">
+      <span class="mobile-brand-icon">⚖</span>
+      <span class="mobile-brand-text">Gracianus Codex</span>
+    </a>
+  </header>
+
+  <!-- Overlay for mobile sidebar -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar" id="sidebar" aria-label="Navegación principal">
+    <div class="sidebar-brand">
+      <div class="brand-icon">⚖</div>
+      <h1 class="brand-title">Gracianus</h1>
+      <p class="brand-subtitle">CODEX NAVIGATOR</p>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <ul class="sidebar-nav" role="list">
+      <li>
+        <a href="index.html#inicio" class="nav-link" id="nav-inicio">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <span>Inicio</span>
+        </a>
+      </li>
+      <li>
+        <a href="index.html#documentos" class="nav-link" id="nav-documentos">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+          <span>Documentos Jur&#237;dicos</span>
+        </a>
+      </li>
+      <li>
+        <a href="index.html#informacion" class="nav-link" id="nav-informacion">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <span>Información del Proyecto</span>
+        </a>
+      </li>
+      <li>
+        <a href="index.html#contacto" class="nav-link" id="nav-contacto">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          <span>Contacto</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-divider"></div>
+      <p class="footer-text">© 2026 Gracianus: Codex Navigator</p>
+      <p class="footer-text footer-text--small">Todos los derechos reservados · <a href="privacidad.html" class="footer-link">Privacidad</a></p>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="main-content" id="mainContent">
+
+    <section class="content-section active" id="section-privacidad">
+
+      <a href="index.html" class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+          <line x1="19" y1="12" x2="5" y2="12"/>
+          <polyline points="12 19 5 12 12 5"/>
+        </svg>
+        <span>Volver a la plataforma</span>
+      </a>
+
+      <div class="section-header">
+        <h2 class="section-title">Políticas de Privacidad y Uso de Contenido</h2>
+        <p style="font-size: 1.05rem; color: var(--color-slate); font-weight: 500; margin-top: 6px;">Gracianus Codex</p>
+        <div class="section-rule" style="margin-top: 14px;"></div>
+      </div>
+
+      <div class="privacy-container">
+
+        <!-- 1. Naturaleza y Uso de los Documentos -->
+        <article class="privacy-card">
+          <span class="privacy-card__num">Sección 1</span>
+          <h3 class="privacy-card__title">Naturaleza y Uso de los Documentos</h3>
+          <p class="text-body">
+            Los textos legales eclesiásticos, incluyendo el Código de Derecho Canónico, expuestos en esta plataforma (web y aplicación móvil) son documentos de carácter público. Esta plataforma únicamente actúa como una herramienta de sistematización y navegación digital para facilitar su consulta. El uso de los textos es libre para fines académicos, pastorales y de investigación.
+          </p>
+        </article>
+
+        <!-- 2. Recopilación de Datos y Privacidad -->
+        <article class="privacy-card">
+          <span class="privacy-card__num">Sección 2</span>
+          <h3 class="privacy-card__title">Recopilación de Datos y Privacidad</h3>
+          <p class="text-body">
+            El proyecto Gracianus está comprometido con la soberanía de los datos. Esta aplicación y sitio web no recopilan datos personales identificables, no requieren registro de usuarios y no utilizan cookies de rastreo comercial (como Google Analytics o Facebook Pixel).
+          </p>
+        </article>
+
+        <!-- 3. Analítica Privada y Anónima -->
+        <article class="privacy-card">
+          <span class="privacy-card__num">Sección 3</span>
+          <h3 class="privacy-card__title">Analítica Privada y Anónima</h3>
+          <p class="text-body">
+            Para fines exclusivos de mantenimiento técnico y mejora de la interfaz, se recopilan métricas de uso estrictamente anónimas (como la cantidad de visitas y el tipo de dispositivo). Esta telemetría se procesa de forma local en servidores privados autogestionados mediante tecnología de código abierto (Umami), garantizando que ninguna información sea compartida, vendida ni transferida a servidores de terceros ni a empresas de publicidad.
+          </p>
+        </article>
+
+        <!-- 4. Permisos de la Aplicación -->
+        <article class="privacy-card">
+          <span class="privacy-card__num">Sección 4</span>
+          <h3 class="privacy-card__title">Permisos de la Aplicación</h3>
+          <p class="text-body">
+            La aplicación móvil Gracianus no solicita accesos intrusivos a las funciones del dispositivo (como cámara, micrófono, contactos o ubicación GPS). Su funcionamiento principal es la lectura de bases de datos locales para permitir la consulta sin conexión a internet.
+          </p>
+        </article>
+
+        <!-- 5. Contacto -->
+        <article class="privacy-card">
+          <span class="privacy-card__num">Sección 5</span>
+          <h3 class="privacy-card__title">Contacto</h3>
+          <p class="text-body">
+            Para cualquier duda sobre el funcionamiento técnico de la plataforma, puede contactar al desarrollador responsable de la sistematización digital a través de la sección de <a href="index.html#contacto" style="color: var(--color-navy); font-weight: 600; text-decoration: underline;">Contacto</a> o escribiendo directamente a <a href="mailto:gpesanchez87@gmail.com" style="color: var(--color-navy); font-weight: 600; text-decoration: underline;">gpesanchez87@gmail.com</a>.
+          </p>
+        </article>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if (hamburgerBtn && sidebar && overlay) {
+      function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.add('active');
+        hamburgerBtn.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+        hamburgerBtn.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      hamburgerBtn.addEventListener('click', () => {
+        sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+      });
+      overlay.addEventListener('click', closeSidebar);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sidebar.classList.contains('open')) closeSidebar();
+      });
+    }
+  </script>
+
+</body>
+</html>

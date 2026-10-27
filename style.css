@@ -319,6 +319,17 @@ p {
   margin-top: 2px;
 }
 
+.footer-link {
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color var(--transition-fast);
+}
+
+.footer-link:hover {
+  color: var(--color-navy);
+}
+
 /* --- Sidebar Overlay (Mobile) --- */
 .sidebar-overlay {
   display: none;
