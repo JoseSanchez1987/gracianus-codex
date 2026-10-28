@@ -273,6 +273,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Body text
     document.getElementById('canonDetailBody').textContent = canon.texto;
 
+    // Enlace a Interpretación Auténtica (si aplica)
+    let interpContainer = document.getElementById('canonDetailInterp');
+    if (!interpContainer) {
+      interpContainer = document.createElement('div');
+      interpContainer.id = 'canonDetailInterp';
+      document.getElementById('canonDetailBody').after(interpContainer);
+    }
+    if (canon.tiene_interpretacion) {
+      interpContainer.innerHTML = '<a href="interpretaciones.html" class="enlace-interpretacion" style="display: inline-block; margin-top: 15px; padding: 5px 10px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.85em; text-decoration: none; border: 1px solid #cbd5e1;">◂ Ver Interpretación Auténtica</a>';
+    } else {
+      interpContainer.innerHTML = '';
+    }
+
     // Update navigation controls (Previous / Next)
     updateCanonNav(canon.numero);
 
@@ -412,12 +425,17 @@ document.addEventListener('DOMContentLoaded', () => {
         `<span class="search-result-tag">${highlightMatch(t, query)}</span>`
       ).join('');
 
+      const interpLinkHtml = canon.tiene_interpretacion
+        ? `<div><a href="interpretaciones.html" class="enlace-interpretacion" onclick="event.stopPropagation();" style="display: inline-block; margin-top: 10px; padding: 4px 8px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.85em; text-decoration: none; border: 1px solid #cbd5e1;">◂ Ver Interpretación Auténtica</a></div>`
+        : '';
+
       return `
         <div class="search-result-item" data-canon="${canon.numero}" role="button" tabindex="0">
           <div class="search-result-number">${canon.numero}</div>
           <div class="search-result-content">
             <div class="search-result-title">Canon ${canon.numero}</div>
             <div class="search-result-excerpt">${highlightedText}</div>
+            ${interpLinkHtml}
             <div class="search-result-tags">${tagsHtml}</div>
           </div>
         </div>

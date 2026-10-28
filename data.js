@@ -1,5 +1,5 @@
 const DB_DATA =
- {
+{
   "estructura": [
     {
       "libro": "Libro I: De las normas generales",
@@ -3312,7 +3312,8 @@ const DB_DATA =
         "leyes eclesiásticas",
         "decretos"
       ],
-      "texto": "§ 1. Quienes gozan de potestad ejecutiva, pueden dar, dentro de los límites de su propia competencia, decretos generales ejecutorios, es decir, aquellos por los que se determina más detalladamente el modo que ha de observarse en el cumplimiento de la ley, o se urge la observancia de las leyes. § 2. En lo que atañe a la promulgación y vacación de los decretos a los que se refiere el § 1, obsérvense las prescripciones del c. 8."
+      "texto": "§ 1. Quienes gozan de potestad ejecutiva, pueden dar, dentro de los límites de su propia competencia, decretos generales ejecutorios, es decir, aquellos por los que se determina más detalladamente el modo que ha de observarse en el cumplimiento de la ley, o se urge la observancia de las leyes. § 2. En lo que atañe a la promulgación y vacación de los decretos a los que se refiere el § 1, obsérvense las prescripciones del c. 8.",
+      "tiene_interpretacion": true
     },
     {
       "numero": 32,
@@ -3322,7 +3323,8 @@ const DB_DATA =
         "leyes eclesiásticas",
         "decretos"
       ],
-      "texto": "Los decretos generales ejecutorios obligan a los que obligan las leyes cuyas condiciones de ejecución determinan o cuya observancia urgen esos mismos decretos."
+      "texto": "Los decretos generales ejecutorios obligan a los que obligan las leyes cuyas condiciones de ejecución determinan o cuya observancia urgen esos mismos decretos.",
+      "tiene_interpretacion": true
     },
     {
       "numero": 33,
@@ -3333,7 +3335,8 @@ const DB_DATA =
         "leyes eclesiásticas",
         "decretos"
       ],
-      "texto": "§ 1. Los decretos generales ejecutorios, aunque se publiquen en directorios o documentos de otro nombre, no derogan las leyes, y sus prescripciones que sean contrarias a las leyes no tienen valor alguno. § 2. Tales decretos pierden su vigor por revocación explícita o implícita hecha por la autoridad competente, y también al cesar la ley para cuya ejecución fueron dados; pero no cesan al concluir la potestad de quien los dictó, a no ser que se disponga expresamente otra cosa."
+      "texto": "§ 1. Los decretos generales ejecutorios, aunque se publiquen en directorios o documentos de otro nombre, no derogan las leyes, y sus prescripciones que sean contrarias a las leyes no tienen valor alguno. § 2. Tales decretos pierden su vigor por revocación explícita o implícita hecha por la autoridad competente, y también al cesar la ley para cuya ejecución fueron dados; pero no cesan al concluir la potestad de quien los dictó, a no ser que se disponga expresamente otra cosa.",
+      "tiene_interpretacion": true
     },
     {
       "numero": 34,
@@ -3852,7 +3855,8 @@ const DB_DATA =
         "leyes eclesiásticas",
         "dispensa"
       ],
-      "texto": "§ 1. El Obispo diocesano, siempre que, a su juicio, ello redunde en bien espiritual de los fieles, puede dispensar a éstos de las leyes disciplinares tanto universales como particulares promulgadas para su territorio o para sus súbditos por la autoridad suprema de la Iglesia; pero no de las leyes procesales o penales, ni de aquellas cuya dispensa se reserva especialmente a la Sede Apostólica o a otra autoridad. § 2. Si es difícil recurrir a la Santa Sede y existe además peligro de grave daño en la demora, cualquier Ordinario puede dispensar de tales leyes, aunque la dispensa esté reservada a la Santa Sede, con tal de que se trate de una dispensa que ésta suela conceder en las mismas circunstancias, sin perjuicio de lo prescrito en el c. 291."
+      "texto": "§ 1. El Obispo diocesano, siempre que, a su juicio, ello redunde en bien espiritual de los fieles, puede dispensar a éstos de las leyes disciplinares tanto universales como particulares promulgadas para su territorio o para sus súbditos por la autoridad suprema de la Iglesia; pero no de las leyes procesales o penales, ni de aquellas cuya dispensa se reserva especialmente a la Sede Apostólica o a otra autoridad. § 2. Si es difícil recurrir a la Santa Sede y existe además peligro de grave daño en la demora, cualquier Ordinario puede dispensar de tales leyes, aunque la dispensa esté reservada a la Santa Sede, con tal de que se trate de una dispensa que ésta suela conceder en las mismas circunstancias, sin perjuicio de lo prescrito en el c. 291.",
+      "tiene_interpretacion": true
     },
     {
       "numero": 88,
@@ -4194,7 +4198,8 @@ const DB_DATA =
         "normas generales",
         "derecho canónico"
       ],
-      "capitulo": "Título VI: De las personas físicas y jurídicas – Capítulo II: De las personas jurídicas"
+      "capitulo": "Título VI: De las personas físicas y jurídicas – Capítulo II: De las personas jurídicas",
+      "tiene_interpretacion": true
     },
     {
       "numero": 120,
@@ -4278,7 +4283,8 @@ const DB_DATA =
         "normas generales",
         "derecho canónico"
       ],
-      "capitulo": "Título VII: De los actos jurídicos"
+      "capitulo": "Título VII: De los actos jurídicos",
+      "tiene_interpretacion": true
     },
     {
       "numero": 128,
@@ -5434,7 +5440,8 @@ const DB_DATA =
         "liturgia"
       ],
       "notas": "",
-      "capitulo": "Parte I: De los fieles cristianos - Título II: De las obligaciones y derechos de los fieles laicos"
+      "capitulo": "Parte I: De los fieles cristianos - Título II: De las obligaciones y derechos de los fieles laicos",
+      "tiene_interpretacion": true
     },
     {
       "numero": 231,
@@ -6309,7 +6316,8 @@ const DB_DATA =
         "estatutos"
       ],
       "notas": "",
-      "capitulo": "Parte I: De los fieles cristianos - Título V: De las asociaciones de fieles - Capítulo I: Normas comunes"
+      "capitulo": "Parte I: De los fieles cristianos - Título V: De las asociaciones de fieles - Capítulo I: Normas comunes",
+      "tiene_interpretacion": true
     },
     {
       "numero": 300,
@@ -6898,7 +6906,8 @@ const DB_DATA =
         "asambleas"
       ],
       "notas": "",
-      "capitulo": "Parte II: De la constitución jerárquica de la Iglesia - Sección I: De la Suprema Autoridad de la Iglesia - Capítulo II: Del Sínodo de Obispos"
+      "capitulo": "Parte II: De la constitución jerárquica de la Iglesia - Sección I: De la Suprema Autoridad de la Iglesia - Capítulo II: Del Sínodo de Obispos",
+      "tiene_interpretacion": true
     },
     {
       "numero": 347,
@@ -7599,7 +7608,8 @@ const DB_DATA =
         "residencia"
       ],
       "notas": "",
-      "capitulo": "Parte II: De la constitución jerárquica de la Iglesia - Sección II: De las Iglesias Particulares y de sus Agrupaciones - Título I: De las Iglesias particulares y de la autoridad constituida en ellas - Capítulo II: De los Obispos - De los Obispos diocesanos"
+      "capitulo": "Parte II: De la constitución jerárquica de la Iglesia - Sección II: De las Iglesias Particulares y de sus Agrupaciones - Título I: De las Iglesias particulares y de la autoridad constituida en ellas - Capítulo II: De los Obispos - De los Obispos diocesanos",
+      "tiene_interpretacion": true
     },
     {
       "numero": 403,
@@ -8001,7 +8011,8 @@ const DB_DATA =
         "cooperación pastoral"
       ],
       "notas": "",
-      "capitulo": "Parte II: De la constitución jerárquica de la Iglesia - Sección II: De las Iglesias Particulares y de sus Agrupaciones - Título II: De las agrupaciones de las Iglesias particulares - Capítulo I: De las Provincias eclesiásticas y de las Regiones eclesiásticas"
+      "capitulo": "Parte II: De la constitución jerárquica de la Iglesia - Sección II: De las Iglesias Particulares y de sus Agrupaciones - Título II: De las agrupaciones de las Iglesias particulares - Capítulo I: De las Provincias eclesiásticas y de las Regiones eclesiásticas",
+      "tiene_interpretacion": true
     },
     {
       "numero": 435,
@@ -8211,7 +8222,8 @@ const DB_DATA =
         "comisiones"
       ],
       "notas": "",
-      "capitulo": "Parte II: De la constitución jerárquica de la Iglesia - Sección II: De las Iglesias Particulares y de sus Agrupaciones - Título II: De las agrupaciones de las Iglesias particulares - Capítulo IV: De las Conferencias Episcopales"
+      "capitulo": "Parte II: De la constitución jerárquica de la Iglesia - Sección II: De las Iglesias Particulares y de sus Agrupaciones - Título II: De las agrupaciones de las Iglesias particulares - Capítulo IV: De las Conferencias Episcopales",
+      "tiene_interpretacion": true
     },
     {
       "numero": 452,
@@ -8224,7 +8236,8 @@ const DB_DATA =
         "asambleas"
       ],
       "notas": "",
-      "capitulo": "Parte II: De la constitución jerárquica de la Iglesia - Sección II: De las Iglesias Particulares y de sus Agrupaciones - Título II: De las agrupaciones de las Iglesias particulares - Capítulo IV: De las Conferencias Episcopales"
+      "capitulo": "Parte II: De la constitución jerárquica de la Iglesia - Sección II: De las Iglesias Particulares y de sus Agrupaciones - Título II: De las agrupaciones de las Iglesias particulares - Capítulo IV: De las Conferencias Episcopales",
+      "tiene_interpretacion": true
     },
     {
       "numero": 453,
@@ -8261,7 +8274,8 @@ const DB_DATA =
         "revisión pontificia"
       ],
       "notas": "",
-      "capitulo": "Parte II: De la constitución jerárquica de la Iglesia - Sección II: De las Iglesias Particulares y de sus Agrupaciones - Título II: De las agrupaciones de las Iglesias particulares - Capítulo IV: De las Conferencias Episcopales"
+      "capitulo": "Parte II: De la constitución jerárquica de la Iglesia - Sección II: De las Iglesias Particulares y de sus Agrupaciones - Título II: De las agrupaciones de las Iglesias particulares - Capítulo IV: De las Conferencias Episcopales",
+      "tiene_interpretacion": true
     },
     {
       "numero": 456,
@@ -8845,7 +8859,8 @@ const DB_DATA =
         "vicariatos"
       ],
       "notas": "",
-      "capitulo": "Parte II: De la constitución jerárquica de la Iglesia - Sección II: De las Iglesias Particulares y de sus Agrupaciones - Título III: De la ordenación interna de las Iglesias particulares - Capítulo III: Del consejo presbiteral y del colegio de consultores"
+      "capitulo": "Parte II: De la constitución jerárquica de la Iglesia - Sección II: De las Iglesias Particulares y de sus Agrupaciones - Título III: De la ordenación interna de las Iglesias particulares - Capítulo III: Del consejo presbiteral y del colegio de consultores",
+      "tiene_interpretacion": true
     },
     {
       "numero": 503,
@@ -8933,7 +8948,8 @@ const DB_DATA =
         "idoneidad"
       ],
       "notas": "",
-      "capitulo": "Parte II: De la constitución jerárquica de la Iglesia - Sección II: De las Iglesias Particulares y de sus Agrupaciones - Título III: De la ordenación interna de las Iglesias particulares - Capítulo IV: De los cabildos de canónigos"
+      "capitulo": "Parte II: De la constitución jerárquica de la Iglesia - Sección II: De las Iglesias Particulares y de sus Agrupaciones - Título III: De la ordenación interna de las Iglesias particulares - Capítulo IV: De los cabildos de canónigos",
+      "tiene_interpretacion": true
     },
     {
       "numero": 510,
@@ -11144,7 +11160,8 @@ const DB_DATA =
         "prueba"
       ],
       "notas": "",
-      "capitulo": "Parte III: De los institutos de vida consagrada y de las sociedades de vida apostólica - Sección I: De los Institutos de Vida Consagrada - Título II: De los institutos religiosos - Capítulo VI: De la separación del instituto - Del tránsito a otro instituto"
+      "capitulo": "Parte III: De los institutos de vida consagrada y de las sociedades de vida apostólica - Sección I: De los Institutos de Vida Consagrada - Título II: De los institutos religiosos - Capítulo VI: De la separación del instituto - Del tránsito a otro instituto",
+      "tiene_interpretacion": true
     },
     {
       "numero": 685,
@@ -11200,7 +11217,7 @@ const DB_DATA =
       "numero": 689,
       "libro": "Libro II: Del pueblo de Dios",
       "titulo": "Parte III: De los institutos de vida consagrada y de las sociedades de vida apostólica - Sección I: De los Institutos de Vida Consagrada - Título II: De los institutos religiosos - Capítulo VI: De la separación del instituto - De la salida del instituto",
-      "texto": "§ 1. Cumplido el tiempo de la profesión temporal de un miembro, habiendo causas justas, el Superior mayor competente, oído su consejo, puede excluirlo de la profesión subsiguiente. § 2. La enfermedad física o psíquica, aunque se haya contraído después de la profesión, si es de tal naturaleza que a juicio de los peritos hace al miembro del que se trata en el § 1 no apto para vivir en el instituto, constituye causa para no admitirle a renovar la profesión o a emitir la profesión perpetua, a no ser que la enfermedad se hubiera contraído por negligencia del instituto o por el trabajo realizado en éste. § 3. But si el religioso, durante los votos temporales, cayera en amencia, aunque no sea capaz de hacer nueva profesión, no puede sin embargo ser despedido del instituto.",
+      "texto": "§ 1. Cumplido el tiempo de la profesión temporal de un miembro, habiendo causas justas, el Superior mayor competente, oído su consejo, puede excluirlo de la profesión subsiguiente. § 2. La enfermedad física o psíquica, aunque se haya contraído después de la profesión, si es de tal naturaleza que a juicio de los peritos hace al miembro del que se trata en el § 1 no apto para vivir en el instituto, constituye causa para no admitirle a renovar la profesión o a emitir la profesión perpetua, a no ser que la enfermedad se hubiera contraído por negligencia del instituto o por el trabajo realizado en éste. § 3. Pero si el religioso, durante los votos temporales, cayera en amencia, aunque no sea capaz de hacer nueva profesión, no puede sin embargo ser despedido del instituto.",
       "temas": [
         "exclusión",
         "profesión temporal",
@@ -11347,7 +11364,8 @@ const DB_DATA =
         "recurso"
       ],
       "notas": "",
-      "capitulo": "Parte III: De los institutos de vida consagrada y de las sociedades de vida apostólica - Sección I: De los Institutos de Vida Consagrada - Título II: De los institutos religiosos - Capítulo VI: De la separación del instituto - De la expulsión de los miembros"
+      "capitulo": "Parte III: De los institutos de vida consagrada y de las sociedades de vida apostólica - Sección I: De los Institutos de Vida Consagrada - Título II: De los institutos religiosos - Capítulo VI: De la separación del instituto - De la expulsión de los miembros",
+      "tiene_interpretacion": true
     },
     {
       "numero": 701,
@@ -11411,7 +11429,8 @@ const DB_DATA =
         "obediencia"
       ],
       "notas": "",
-      "capitulo": "Parte III: De los institutos de vida consagrada y de las sociedades de vida apostólica - Sección I: De los Institutos de Vida Consagrada - Título II: De los institutos religiosos - Capítulo VII: De los religiosos elevados al Episcopado"
+      "capitulo": "Parte III: De los institutos de vida consagrada y de las sociedades de vida apostólica - Sección I: De los Institutos de Vida Consagrada - Título II: De los institutos religiosos - Capítulo VII: De los religiosos elevados al Episcopado",
+      "tiene_interpretacion": true
     },
     {
       "numero": 706,
@@ -11424,7 +11443,8 @@ const DB_DATA =
         "propiedad"
       ],
       "notas": "",
-      "capitulo": "Parte III: De los institutos de vida consagrada y de las sociedades de vida apostólica - Sección I: De los Institutos de Vida Consagrada - Título II: De los institutos religiosos - Capítulo VII: De los religiosos elevados al Episcopado"
+      "capitulo": "Parte III: De los institutos de vida consagrada y de las sociedades de vida apostólica - Sección I: De los Institutos de Vida Consagrada - Título II: De los institutos religiosos - Capítulo VII: De los religiosos elevados al Episcopado",
+      "tiene_interpretacion": true
     },
     {
       "numero": 707,
@@ -11437,7 +11457,8 @@ const DB_DATA =
         "sustentación"
       ],
       "notas": "",
-      "capitulo": "Parte III: De los institutos de vida consagrada y de las sociedades de vida apostólica - Sección I: De los Institutos de Vida Consagrada - Título II: De los institutos religiosos - Capítulo VII: De los religiosos elevados al Episcopado"
+      "capitulo": "Parte III: De los institutos de vida consagrada y de las sociedades de vida apostólica - Sección I: De los Institutos de Vida Consagrada - Título II: De los institutos religiosos - Capítulo VII: De los religiosos elevados al Episcopado",
+      "tiene_interpretacion": true
     },
     {
       "numero": 708,
@@ -12191,7 +12212,8 @@ const DB_DATA =
         "liturgia"
       ],
       "notas": "",
-      "capitulo": "Título I: El ministerio de la palabra divina - Capítulo I: De la predicación de la palabra de Dios"
+      "capitulo": "Título I: El ministerio de la palabra divina - Capítulo I: De la predicación de la palabra de Dios",
+      "tiene_interpretacion": true
     },
     {
       "numero": 768,
@@ -12953,7 +12975,8 @@ const DB_DATA =
         "censores"
       ],
       "notas": "",
-      "capitulo": "Título IV: De los instrumentos de comunicación social y especialmente de los libros"
+      "capitulo": "Título IV: De los instrumentos de comunicación social y especialmente de los libros",
+      "tiene_interpretacion": true
     },
     {
       "numero": 831,
@@ -13969,7 +13992,8 @@ const DB_DATA =
         "ministro"
       ],
       "notas": "",
-      "capitulo": "Parte I: Los sacramentos - Título III: De la santísima Eucaristía - Capítulo I: De la celebración eucarística"
+      "capitulo": "Parte I: Los sacramentos - Título III: De la santísima Eucaristía - Capítulo I: De la celebración eucarística",
+      "tiene_interpretacion": true
     },
     {
       "numero": 911,
@@ -14059,7 +14083,8 @@ const DB_DATA =
         "comunión"
       ],
       "notas": "",
-      "capitulo": "Parte I: Los sacramentos - Título III: De la santísima Eucaristía - Capítulo I: De la participación en la santísima Eucaristía"
+      "capitulo": "Parte I: Los sacramentos - Título III: De la santísima Eucaristía - Capítulo I: De la participación en la santísima Eucaristía",
+      "tiene_interpretacion": true
     },
     {
       "numero": 918,
@@ -14494,7 +14519,8 @@ const DB_DATA =
         "sacerdote"
       ],
       "notas": "",
-      "capitulo": "Parte I: Los sacramentos - Título III: De la santísima Eucaristía - Capítulo III: Del estipendio ofrecido para la celebración de la misa"
+      "capitulo": "Parte I: Los sacramentos - Título III: De la santísima Eucaristía - Capítulo III: Del estipendio ofrecido para la celebración de la misa",
+      "tiene_interpretacion": true
     },
     {
       "numero": 952,
@@ -14666,7 +14692,8 @@ const DB_DATA =
         "confesionario"
       ],
       "notas": "",
-      "capitulo": "Parte I: Los sacramentos - Título IV: Del sacramento de la Penitencia - Capítulo I: De la celebración del sacramento"
+      "capitulo": "Parte I: Los sacramentos - Título IV: Del sacramento de la Penitencia - Capítulo I: De la celebración del sacramento",
+      "tiene_interpretacion": true
     },
     {
       "numero": 965,
@@ -15653,7 +15680,8 @@ const DB_DATA =
         "delito"
       ],
       "notas": "",
-      "capitulo": "Parte I: Los sacramentos - Título VI: Del Orden - Capítulo II: De los ordenandos - De las irregularidades y de otros impedimentos"
+      "capitulo": "Parte I: Los sacramentos - Título VI: Del Orden - Capítulo II: De los ordenandos - De las irregularidades y de otros impedimentos",
+      "tiene_interpretacion": true
     },
     {
       "numero": 1042,
@@ -15974,7 +16002,8 @@ const DB_DATA =
         "investigación"
       ],
       "notas": "",
-      "capitulo": "Parte I: Los sacramentos - Título VII: Del Matrimonio - Capítulo I: De la atención pastoral y de lo que debe preceder a la celebración del Matrimonio"
+      "capitulo": "Parte I: Los sacramentos - Título VII: Del Matrimonio - Capítulo I: De la atención pastoral y de lo que debe preceder a la celebración del Matrimonio",
+      "tiene_interpretacion": true
     },
     {
       "numero": 1067,
@@ -16452,7 +16481,8 @@ const DB_DATA =
         "miedo"
       ],
       "notas": "",
-      "capitulo": "Parte I: Los sacramentos - Título VII: Del Matrimonio - Capítulo IV: Del consentimiento matrimonial"
+      "capitulo": "Parte I: Los sacramentos - Título VII: Del Matrimonio - Capítulo IV: Del consentimiento matrimonial",
+      "tiene_interpretacion": true
     },
     {
       "numero": 1104,
@@ -18504,7 +18534,8 @@ const DB_DATA =
         "diócesis"
       ],
       "notas": "",
-      "capitulo": "Título I: De la adquisición de bienes"
+      "capitulo": "Título I: De la adquisición de bienes",
+      "tiene_interpretacion": true
     },
     {
       "numero": 1264,
@@ -19671,7 +19702,8 @@ const DB_DATA =
         "sanción",
         "derecho canónico"
       ],
-      "texto": "Los padres, o quienes hacen sus veces, que entregan a sus hijos para que sean bautizados o educados en una religión acatólica, deben ser castigados con una censura u otra pena justa."
+      "texto": "Los padres, o quienes hacen sus veces, que entregan a sus hijos para que sean bautizados o educados en una religión acatólica, deben ser castigados con una censura u otra pena justa.",
+      "tiene_interpretacion": true
     },
     {
       "numero": 1368,
@@ -19979,7 +20011,8 @@ const DB_DATA =
         "expulsión clerical",
         "delitos contra menores"
       ],
-      "texto": "§ 1. Sea castigado con la privación del oficio y con otras justas penas, sin excluir, si el caso lo requiriese, la expulsión del estado clerical, el clérigo: 1º que comete un delito contra el sexto mandamiento del Decálogo con un menor o con persona que habitualmente tiene un uso imperfecto de la razón o a la que el derecho reconoce igual tutela; 2º que recluta o induce a un menor, o a una persona que habitualmente tiene un uso imperfecto de la razón, o a la que el derecho reconoce igual tutela, para que se exponga pornográficamente o para participar en exhibiciones pornográficas, tanto verdaderas como simuladas; 3º que inmoralmente adquiere, conserva, exhibe o divulga, en cualquier forma y con cualquier instrumento, imágenes pornográficas de menores o de personas que habitualmente tienen un uso imperfecto de la razón. § 2. El miembro de un instituto de vida consagrada o de una sociedad de vida apostólica, y cualquier fiel que goce de una dignidad o ejercite un oficio o una función en la Iglesia, si comete uno de los delitos enumerados en el § 1 o en el c. 1395, § 3, sea castigado según el c. 1336, §§ 2-4, y con el añadido de otras penas en proporción a la gravedad del delito."
+      "texto": "§ 1. Sea castigado con la privación del oficio y con otras justas penas, sin excluir, si el caso lo requiriese, la expulsión del estado clerical, el clérigo: 1º que comete un delito contra el sexto mandamiento del Decálogo con un menor o con persona que habitualmente tiene un uso imperfecto de la razón o a la que el derecho reconoce igual tutela; 2º que recluta o induce a un menor, o a una persona que habitualmente tiene un uso imperfecto de la razón, o a la que el derecho reconoce igual tutela, para que se exponga pornográficamente o para participar en exhibiciones pornográficas, tanto verdaderas como simuladas; 3º que inmoralmente adquiere, conserva, exhibe o divulga, en cualquier forma y con cualquier instrumento, imágenes pornográficas de menores o de personas que habitualmente tienen un uso imperfecto de la razón. § 2. El miembro de un instituto de vida consagrada o de una sociedad de vida apostólica, y cualquier fiel que goce de una dignidad o ejercite un oficio o una función en la Iglesia, si comete uno de los delitos enumerados en el § 1 o en el c. 1395, § 3, sea castigado según el c. 1336, §§ 2-4, y con el añadido de otras penas en proporción a la gravedad del delito.",
+      "tiene_interpretacion": true
     },
     {
       "numero": 1399,
@@ -21544,7 +21577,8 @@ const DB_DATA =
         "eficacia"
       ],
       "notas": "",
-      "capitulo": "Parte II: Del juicio contencioso - SECCIÓN I - TÍTULO III: De la instancia judicial"
+      "capitulo": "Parte II: Del juicio contencioso - SECCIÓN I - TÍTULO III: De la instancia judicial",
+      "tiene_interpretacion": true
     },
     {
       "numero": 1523,
@@ -21581,7 +21615,8 @@ const DB_DATA =
         "costas"
       ],
       "notas": "",
-      "capitulo": "Parte II: Del juicio contencioso - SECCIÓN I - TÍTULO III: De la instancia judicial"
+      "capitulo": "Parte II: Del juicio contencioso - SECCIÓN I - TÍTULO III: De la instancia judicial",
+      "tiene_interpretacion": true
     },
     {
       "numero": 1526,
@@ -23470,7 +23505,8 @@ const DB_DATA =
         "tribunal"
       ],
       "notas": "",
-      "capitulo": "Parte III: De algunos procesos especiales - Título I: De los procesos matrimoniales - Capítulo I: De las causas para declarar la nulidad del matrimonio"
+      "capitulo": "Parte III: De algunos procesos especiales - Título I: De los procesos matrimoniales - Capítulo I: De las causas para declarar la nulidad del matrimonio",
+      "tiene_interpretacion": true
     },
     {
       "numero": 1674,
@@ -23639,7 +23675,8 @@ const DB_DATA =
         "instructor"
       ],
       "notas": "",
-      "capitulo": "Parte III: De algunos procesos especiales - Título I: De los procesos matrimoniales - Capítulo I: De las causas para declarar la nulidad del matrimonio - Del proceso matrimonial más breve ante el Obispo"
+      "capitulo": "Parte III: De algunos procesos especiales - Título I: De los procesos matrimoniales - Capítulo I: De las causas para declarar la nulidad del matrimonio - Del proceso matrimonial más breve ante el Obispo",
+      "tiene_interpretacion": true
     },
     {
       "numero": 1687,
@@ -24301,7 +24338,8 @@ const DB_DATA =
         "plazo"
       ],
       "notas": "",
-      "capitulo": "Parte V: De los procedimientos en los recursos administrativos y en la remoción o el traslado de los párrocos - Sección I: Del recurso contra los decretos administrativos"
+      "capitulo": "Parte V: De los procedimientos en los recursos administrativos y en la remoción o el traslado de los párrocos - Sección I: Del recurso contra los decretos administrativos",
+      "tiene_interpretacion": true
     },
     {
       "numero": 1738,
@@ -24503,4 +24541,4 @@ const DB_DATA =
       "capitulo": "Parte V: De los procedimientos en los recursos administrativos y en la remoción o el traslado de los párrocos - Sección II: Del procedimiento para la remoción y traslado de los párrocos - Capítulo II: Del modo de proceder en el traslado de los párrocos"
     }
   ]
-}
+};

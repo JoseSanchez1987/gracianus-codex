@@ -2345,3 +2345,20 @@ mark {
 .ct-card--anexo:focus-visible {
   border-color: #9a6c1a;
 }
+
+/* Enlace a Interpretación Auténtica */
+.enlace-interpretacion {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.enlace-interpretacion:hover {
+  background-color: #e2e8f0 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+  transform: translateY(-1px);
+}
+
