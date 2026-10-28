@@ -70,95 +70,150 @@
       max-width: 860px;
     }
 
+    /* Contenedor de acordeones */
     .interp-container {
       max-width: 860px;
       margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .interp-accordion {
       background: var(--color-surface);
       border: 1px solid var(--color-border-light);
-      border-radius: var(--radius-xl);
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      box-shadow: 0 2px 12px rgba(44, 62, 90, 0.04);
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
     }
 
-    .interp-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
+    .interp-accordion:hover {
+      border-color: var(--color-border);
+      box-shadow: 0 4px 16px rgba(44, 62, 90, 0.05);
     }
 
-    .interp-item {
-      border-bottom: 1px solid var(--color-border-light);
-      transition: background var(--transition-fast);
+    .interp-accordion[open] {
+      border-color: var(--color-accent);
+      box-shadow: 0 6px 20px rgba(44, 62, 90, 0.08);
     }
 
-    .interp-item:last-child {
-      border-bottom: none;
-    }
-
-    .interp-link {
+    .interp-summary {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      padding: 16px 24px;
-      text-decoration: none;
-      color: inherit;
-      transition: all var(--transition-fast);
+      padding: 18px 24px;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+      transition: background var(--transition-fast);
     }
 
-    .interp-link:hover {
+    .interp-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .interp-summary:hover {
       background: var(--color-bg-warm);
     }
 
-    .interp-left {
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
-      flex-wrap: wrap;
+    .interp-accordion[open] .interp-summary {
+      background: var(--color-bg-warm);
+      border-bottom: 1px solid var(--color-border-light);
     }
 
-    .interp-date {
+    .interp-summary__left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .interp-canones {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
       font-weight: 700;
       color: var(--color-navy-dark);
-      font-size: 0.98rem;
+      margin: 0;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
     }
 
-    .interp-ref {
+    .interp-meta {
+      font-family: var(--font-body);
       font-size: 0.88rem;
       color: var(--color-slate);
-      font-style: normal;
+      font-weight: 500;
+      line-height: 1.4;
     }
 
-    .interp-action {
-      display: flex;
+    .interp-summary__action {
+      display: inline-flex;
       align-items: center;
-      gap: 6px;
-      color: var(--color-accent);
+      gap: 8px;
+      color: var(--color-navy);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border-light);
+      padding: 7px 14px;
+      border-radius: 100px;
+      font-family: var(--font-body);
       font-size: 0.82rem;
       font-weight: 600;
       flex-shrink: 0;
-      opacity: 0.85;
       transition: all var(--transition-fast);
     }
 
-    .interp-link:hover .interp-action {
-      opacity: 1;
-      transform: translateX(3px);
+    .interp-summary:hover .interp-summary__action {
+      color: var(--color-surface);
+      background: var(--color-navy);
+      border-color: var(--color-navy);
     }
 
-    .interp-arrow {
-      transition: transform var(--transition-fast);
+    .interp-accordion[open] .interp-summary__action {
+      color: var(--color-surface);
+      background: var(--color-accent);
+      border-color: var(--color-accent);
     }
 
-    @media (max-width: 600px) {
-      .interp-link {
-        padding: 14px 18px;
+    .interp-chevron {
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .interp-accordion[open] .interp-chevron {
+      transform: rotate(180deg);
+    }
+
+    .interp-body {
+      padding: 24px 28px;
+      background: var(--color-surface);
+      font-family: var(--font-body);
+      font-size: 0.96rem;
+      line-height: 1.75;
+      color: var(--color-navy-dark);
+      animation: interpFadeIn 0.2s ease-out;
+    }
+
+    .interp-body p {
+      margin: 0;
+      color: var(--color-slate);
+    }
+
+    @keyframes interpFadeIn {
+      from { opacity: 0; transform: translateY(-3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 640px) {
+      .interp-summary {
+        padding: 16px 18px;
         flex-direction: column;
         align-items: flex-start;
-        gap: 8px;
+        gap: 12px;
       }
-      .interp-action {
-        align-self: flex-end;
+      .interp-summary__action {
+        align-self: flex-start;
+      }
+      .interp-body {
+        padding: 20px 18px;
       }
     }
   </style>
@@ -291,344 +346,406 @@
       </div>
 
       <div class="interp-container">
-        <ul class="interp-list" role="list">
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">11 de julio de 1984</strong>
-                <span class="interp-ref">(AAS, LXXVI, 1984, 746-747)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 1 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Cánones 502 § 1; 917; 1066; 1686</h3>
+              <span class="interp-meta">11 de julio de 1984 (AAS, LXXVI, 1984, 746-747)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">5 de julio de 1985</strong>
-                <span class="interp-ref">(AAS, LXXVII, 1985, 771)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 2 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Cánones 31-33; 87 § 1; 127 § 1; 451 § 1</h3>
+              <span class="interp-meta">5 de julio de 1985 (AAS, LXXVII, 1985, 771)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">17 de mayo de 1986 (1ª)</strong>
-                <span class="interp-ref">(AAS, LXXVIII, 1986, 1323)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 3 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Canon 1673, 3º</h3>
+              <span class="interp-meta">17 de mayo de 1986 (1ª) (AAS, LXXVIII, 1986, 1323)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">17 de mayo de 1986 (2ª)</strong>
-                <span class="interp-ref">(AAS, LXXVIII, 1986, 1323-1324)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 4 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Canon 700</h3>
+              <span class="interp-meta">17 de mayo de 1986 (2ª) (AAS, LXXVIII, 1986, 1323-1324)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">17 de mayo de 1986 (3ª)</strong>
-                <span class="interp-ref">(AAS, LXXVIII, 1986, 1324)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 5 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Cánones 705-707; 1522; 1525</h3>
+              <span class="interp-meta">17 de mayo de 1986 (3ª) (AAS, LXXVIII, 1986, 1324)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">17 de mayo de 1986 (4ª)</strong>
-                <span class="interp-ref">(AAS, LXXVIII, 1986, 1324)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 6 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Canon 1367</h3>
+              <span class="interp-meta">17 de mayo de 1986 (4ª) (AAS, LXXVIII, 1986, 1324)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">23 de abril de 1987 (1ª)</strong>
-                <span class="interp-ref">(AAS, LXXIX, 1987, 1132)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 7 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Canon 1103</h3>
+              <span class="interp-meta">23 de abril de 1987 (1ª) (AAS, LXXIX, 1987, 1132)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">23 de abril de 1987 (2ª)</strong>
-                <span class="interp-ref">(AAS, LXXIX, 1987, 1132)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 8 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Canon 951 § 1</h3>
+              <span class="interp-meta">23 de abril de 1987 (2ª) (AAS, LXXIX, 1987, 1132)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">20 de junio de 1987 (1ª)</strong>
-                <span class="interp-ref">(AAS, LXXIX, 1987, 1249)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 9 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Cánones 684 § 3; 830 § 3</h3>
+              <span class="interp-meta">20 de junio de 1987 (1ª) (AAS, LXXIX, 1987, 1249)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">20 de junio de 1987 (2ª)</strong>
-                <span class="interp-ref">(AAS, LXXX, 1988, 1818)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 10 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Cánones 299 § 3; 1737</h3>
+              <span class="interp-meta">20 de junio de 1987 (2ª) (AAS, LXXX, 1988, 1818)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">20 de junio de 1987 (3ª)</strong>
-                <span class="interp-ref">(AAS, LXXIX, 1987, 1249)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 11 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Canon 767 § 1</h3>
+              <span class="interp-meta">20 de junio de 1987 (3ª) (AAS, LXXIX, 1987, 1249)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">23 de mayo de 1988 (1ª)</strong>
-                <span class="interp-ref">(AAS, LXXX, 1988, 1818-1819)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 12 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Cánones 705-707; 1398</h3>
+              <span class="interp-meta">23 de mayo de 1988 (1ª) (AAS, LXXX, 1988, 1818-1819)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">23 de mayo de 1988 (2ª)</strong>
-                <span class="interp-ref">(AAS, LXXXI, 1989, 388)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 13 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Cánones 434; 452</h3>
+              <span class="interp-meta">23 de mayo de 1988 (2ª) (AAS, LXXXI, 1989, 388)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">1 de junio de 1988</strong>
-                <span class="interp-ref">(AAS, LXXX, 1988, 1373)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 14 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Cánones 230 § 3; 910 § 2</h3>
+              <span class="interp-meta">1 de junio de 1988 (AAS, LXXX, 1988, 1373)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">20 de mayo de 1989</strong>
-                <span class="interp-ref">(AAS, LXXXI, 1989, 991)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 15 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Cánones 509 § 1; 1263</h3>
+              <span class="interp-meta">20 de mayo de 1989 (AAS, LXXXI, 1989, 991)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">28 de junio de 1990</strong>
-                <span class="interp-ref">(AAS, LXXXII, 1990, 845)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 16 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Canon 119, 1º</h3>
+              <span class="interp-meta">28 de junio de 1990 (AAS, LXXXII, 1990, 845)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">10 de octubre de 1991</strong>
-                <span class="interp-ref">(AAS, LXXXIII, 1991, 1093)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 17 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Cánones 346 § 1; 402 § 1</h3>
+              <span class="interp-meta">10 de octubre de 1991 (AAS, LXXXIII, 1991, 1093)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">11 de junio de 1992</strong>
-                <span class="interp-ref">(AAS, LXXXVI, 1994, 541-542)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 18 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Canon 230 § 2</h3>
+              <span class="interp-meta">11 de junio de 1992 (AAS, LXXXVI, 1994, 541-542)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">7 de julio de 1998</strong>
-                <span class="interp-ref">(L'Osservatore Romano, 13-14 julio 1998, p. 2)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 19 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Canon 964 § 2</h3>
+              <span class="interp-meta">7 de julio de 1998 (L'Osservatore Romano, 13-14 julio 1998, p. 2)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">4 de junio de 1999</strong>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 20 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Canon 1442</h3>
+              <span class="interp-meta">4 de junio de 1999</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-          <li class="interp-item">
-            <a href="#" class="interp-link">
-              <div class="interp-left">
-                <strong class="interp-date">31 de mayo de 2016</strong>
-                <span class="interp-ref">(Boletín de prensa de la Santa Sede, 15 de septiembre de 2016)</span>
-              </div>
-              <div class="interp-action">
-                <span>Ver respuesta</span>
-                <svg class="interp-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            </a>
-          </li>
+        <!-- 21 -->
+        <details class="interp-accordion">
+          <summary class="interp-summary">
+            <div class="interp-summary__left">
+              <h3 class="interp-canones">Canon 1041, nn. 4-5</h3>
+              <span class="interp-meta">31 de mayo de 2016 (Boletín de prensa de la S. Sede, 15 sept 2016)</span>
+            </div>
+            <div class="interp-summary__action">
+              <span>Ver respuesta</span>
+              <svg class="interp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </summary>
+          <div class="interp-body">
+            <p>TEXTO_AQUI</p>
+          </div>
+        </details>
 
-        </ul>
       </div>
 
     </section>
