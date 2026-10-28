@@ -2362,3 +2362,56 @@ mark {
   transform: translateY(-1px);
 }
 
+/* Banner "En construcción" */
+.banner-construccion {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: rgba(217, 119, 6, 0.05);
+  border: 1px solid rgba(217, 119, 6, 0.20);
+  border-left: 4px solid #d97706;
+  padding: 18px 22px;
+  border-radius: var(--radius-md);
+  margin: 24px 0 32px 0;
+}
+
+.banner-construccion__icon {
+  flex-shrink: 0;
+  color: #d97706;
+  margin-top: 2px;
+}
+
+.banner-construccion__title {
+  margin: 0 0 4px 0;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-navy-dark);
+}
+
+.banner-construccion__desc {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.93rem;
+  color: var(--color-slate);
+  line-height: 1.55;
+  text-align: left !important;
+}
+
+/* Badge (Próximamente) en el menú lateral */
+.nav-badge-proximamente {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--color-slate);
+  opacity: 0.85;
+  font-style: italic;
+  margin-left: 5px;
+  letter-spacing: -0.01em;
+}
+
+.nav-link.active .nav-badge-proximamente {
+  color: var(--color-navy-dark);
+}
+
+

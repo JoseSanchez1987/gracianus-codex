@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formularios y Modelos — Gracianus: Codex Navigator</title>
+  <meta name="description" content="Plantillas, libelos y modelos de redacción para la praxis administrativa y judicial canónica.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Desactivar separación silábica con guiones en toda la interfaz */
+    *, *::before, *::after,
+    html, body, p, div, span, a, li, article, section,
+    .text-body, .canon-detail-body {
+      -webkit-hyphens: none !important;
+      -moz-hyphens: none !important;
+      -ms-hyphens: none !important;
+      hyphens: none !important;
+      word-break: normal !important;
+      overflow-wrap: break-word !important;
+    }
+    /* Justificación de texto tipo procesador de textos sin guiones */
+    p,
+    .text-body,
+    .canon-detail-body,
+    .info-card p,
+    .doc-card-featured__desc {
+      text-align: justify !important;
+      text-justify: inter-word !important;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--color-navy);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-light);
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      margin-bottom: 24px;
+      transition: all var(--transition-fast);
+    }
+
+    .back-btn:hover {
+      background: var(--color-bg-warm);
+      border-color: var(--color-border);
+      color: var(--color-navy-dark);
+      transform: translateX(-2px);
+    }
+
+    .back-btn svg {
+      transition: transform var(--transition-fast);
+    }
+
+    .back-btn:hover svg {
+      transform: translateX(-3px);
+    }
+
+    .forms-intro {
+      font-size: 1.05rem;
+      color: var(--color-slate);
+      font-weight: 500;
+      margin-top: 8px;
+      line-height: 1.6;
+      max-width: 860px;
+    }
+  </style>
+  <script defer src="https://joselinux-default-string.tail40fd36.ts.net/script.js" data-website-id="a5cb6a91-11a5-4714-b358-9ba608830fcd"></script>
+  <meta property="og:title" content="Formularios y Modelos — Gracianus: Codex Navigator" />
+  <meta property="og:description" content="Plantillas, libelos y modelos de redacción para la praxis administrativa y judicial canónica." />
+  <meta property="og:image" content="https://josesanchez1987.github.io/gracianus-codex/portada.jpg" />
+  <meta property="og:url" content="https://josesanchez1987.github.io/gracianus-codex/formularios.html" />
+  <meta property="og:type" content="website" />
+</head>
+<body>
+
+  <!-- Mobile Header -->
+  <header class="mobile-header" id="mobileHeader">
+    <button class="hamburger" id="hamburgerBtn" aria-label="Abrir menú de navegación">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <a href="index.html" class="mobile-brand" style="text-decoration: none;">
+      <span class="mobile-brand-icon">⚖</span>
+      <span class="mobile-brand-text">Gracianus Codex</span>
+    </a>
+  </header>
+
+  <!-- Overlay for mobile sidebar -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar" id="sidebar" aria-label="Navegación principal">
+    <div class="sidebar-brand">
+      <div class="brand-icon">⚖</div>
+      <h1 class="brand-title">Gracianus</h1>
+      <p class="brand-subtitle">CODEX NAVIGATOR</p>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <ul class="sidebar-nav" role="list">
+      <li>
+        <a href="index.html#inicio" class="nav-link" id="nav-inicio">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <span>Inicio</span>
+        </a>
+      </li>
+      <li>
+        <a href="index.html#documentos" class="nav-link" id="nav-documentos">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+          <span>Documentos Jur&#237;dicos</span>
+        </a>
+      </li>
+      <li>
+        <a href="esquemas.html" class="nav-link" id="nav-esquemas">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="8" y="2" width="8" height="5" rx="1"/>
+            <rect x="2" y="17" width="8" height="5" rx="1"/>
+            <rect x="14" y="17" width="8" height="5" rx="1"/>
+            <path d="M12 7v4"/>
+            <path d="M6 17v-3a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v3"/>
+          </svg>
+          <span>Esquemas Procesales <span class="nav-badge-proximamente">(Próximamente)</span></span>
+        </a>
+      </li>
+      <li>
+        <a href="formularios.html" class="nav-link active" id="nav-formularios">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+            <line x1="9" y1="12" x2="15" y2="12"/>
+            <line x1="9" y1="16" x2="13" y2="16"/>
+          </svg>
+          <span>Formularios <span class="nav-badge-proximamente">(Próximamente)</span></span>
+        </a>
+      </li>
+      <li>
+        <a href="interpretaciones.html" class="nav-link" id="nav-interpretaciones">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <path d="m9 15 2 2 4-4"/>
+          </svg>
+          <span>Interpretaciones Auténticas</span>
+        </a>
+      </li>
+      <li>
+        <a href="index.html#informacion" class="nav-link" id="nav-informacion">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <span>Información del Proyecto</span>
+        </a>
+      </li>
+      <li>
+        <a href="index.html#contacto" class="nav-link" id="nav-contacto">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          <span>Contacto</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-divider"></div>
+      <div class="footer-version">
+        <span class="version-label">Gracianus Codex v1.0.0</span>
+        <span class="version-sub">Edición Oficial 1983</span>
+      </div>
+      <div class="footer-legal">
+        <p class="legal-text">Texto canónico de la Iglesia Católica.</p>
+        <p class="legal-text legal-credit">Para estudio y consulta pastoral.</p>
+        <p class="legal-text" style="margin-top: 6px;">
+          <a href="privacidad.html" style="color: var(--color-slate-light); text-decoration: underline; font-size: 0.75rem;">Políticas de Privacidad</a>
+        </p>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="main-content" id="mainContent">
+
+    <section class="content-section active" id="section-formularios">
+
+      <a href="index.html" class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+          <line x1="19" y1="12" x2="5" y2="12"/>
+          <polyline points="12 19 5 12 12 5"/>
+        </svg>
+        <span>Volver a la plataforma</span>
+      </a>
+
+      <div class="section-header">
+        <h2 class="section-title">Formularios y Modelos</h2>
+        <p class="forms-intro">
+          Plantillas, libelos y modelos de redacción para la praxis administrativa y judicial canónica.
+        </p>
+        <div class="section-rule" style="margin-top: 16px;"></div>
+      </div>
+
+      <!-- Banner En Construcción -->
+      <div class="banner-construccion">
+        <div class="banner-construccion__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <div>
+          <h4 class="banner-construccion__title">Sección en construcción</h4>
+          <p class="banner-construccion__desc">Estamos trabajando en la compilación de los modelos jurídicos. Estarán disponibles pronto.</p>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if (hamburgerBtn && sidebar && overlay) {
+      function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.add('active');
+        hamburgerBtn.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+        hamburgerBtn.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      hamburgerBtn.addEventListener('click', () => {
+        sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+      });
+      overlay.addEventListener('click', closeSidebar);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sidebar.classList.contains('open')) closeSidebar();
+      });
+    }
+  </script>
+
+</body>
+</html>
