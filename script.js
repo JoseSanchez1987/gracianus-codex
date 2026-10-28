@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('canonDetailBody').after(interpContainer);
     }
     if (canon.tiene_interpretacion) {
-      interpContainer.innerHTML = '<a href="interpretaciones.html" class="enlace-interpretacion" style="display: inline-block; margin-top: 15px; padding: 5px 10px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.85em; text-decoration: none; border: 1px solid #cbd5e1;">◂ Ver Interpretación Auténtica</a>';
+      interpContainer.innerHTML = `<a href="interpretaciones.html?canon=${canon.numero}" class="enlace-interpretacion" style="display: inline-block; margin-top: 15px; padding: 5px 10px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.85em; text-decoration: none; border: 1px solid #cbd5e1;">◂ Ver Interpretación Auténtica</a>`;
     } else {
       interpContainer.innerHTML = '';
     }
@@ -426,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ).join('');
 
       const interpLinkHtml = canon.tiene_interpretacion
-        ? `<div><a href="interpretaciones.html" class="enlace-interpretacion" onclick="event.stopPropagation();" style="display: inline-block; margin-top: 10px; padding: 4px 8px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.85em; text-decoration: none; border: 1px solid #cbd5e1;">◂ Ver Interpretación Auténtica</a></div>`
+        ? `<div><a href="interpretaciones.html?canon=${canon.numero}" class="enlace-interpretacion" onclick="event.stopPropagation();" style="display: inline-block; margin-top: 10px; padding: 4px 8px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.85em; text-decoration: none; border: 1px solid #cbd5e1;">◂ Ver Interpretación Auténtica</a></div>`
         : '';
 
       return `
