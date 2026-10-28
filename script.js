@@ -565,6 +565,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
+      if (!link.dataset.section) return;
       e.preventDefault();
       switchSection(link.dataset.section);
     });
