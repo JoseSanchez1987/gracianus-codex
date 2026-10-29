@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proceso Matrimonial Documental (Mitis Iudex)</title>
+    <style>
+        :root {
+            /* Colores corporativos solicitados */
+            --bg-color: #f1f5f9;
+            --text-color: #1e293b;
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+            --shadow-subtle: 0 4px 6px -1px rgba(30, 41, 59, 0.1), 0 2px 4px -2px rgba(30, 41, 59, 0.05);
+            --shadow-hover: 0 10px 15px -3px rgba(30, 41, 59, 0.15), 0 4px 6px -4px rgba(30, 41, 59, 0.1);
+            --line-color: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            padding: 2rem 1rem;
+            -webkit-hyphens: none;
+            -ms-hyphens: none;
+            hyphens: none; /* Regla aplicada: Evitar corte de palabras */
+        }
+
+        header {
+            max-width: 800px;
+            margin: 0 auto 3rem auto;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            line-height: 1.2;
+        }
+
+        .hierarchy-rule {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            box-shadow: var(--shadow-subtle);
+            text-align: left;
+        }
+
+        /* Línea de tiempo vertical */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-left: 1rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 28px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--line-color);
+            border-radius: 2px;
+        }
+
+        .phase {
+            position: relative;
+            margin-bottom: 3rem;
+            padding-left: 60px;
+        }
+
+        .phase::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 5px;
+            width: 24px;
+            height: 24px;
+            background: var(--text-color);
+            border-radius: 50%;
+            border: 4px solid var(--bg-color);
+            z-index: 1;
+        }
+
+        .phase-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-color);
+        }
+
+        .step {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-subtle);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .step:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .step-header {
+            padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .step-body {
+            padding: 1rem 1.5rem 1.5rem 1.5rem;
+            font-size: 0.95rem;
+            color: #334155;
+        }
+
+        .step-body p {
+            margin-bottom: 0.8rem;
+        }
+
+        .step-body ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-body li {
+            margin-bottom: 0.4rem;
+        }
+
+        .note {
+            background-color: #e2e8f0;
+            border-left: 4px solid var(--text-color);
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .badge-mi {
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: inline-block;
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        .citations-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        /* Estilos para el diagrama de flujo final */
+        .diagram-container {
+            max-width: 800px;
+            margin: 4rem auto;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .diagram-title {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .flow-node {
+            background: var(--text-color);
+            color: var(--bg-color);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            width: 80%;
+            margin: 0 auto;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
+        }
+
+        .flow-node span {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: normal;
+            margin-top: 0.5rem;
+            opacity: 0.9;
+            color: #cbd5e1;
+        }
+
+        .flow-arrow {
+            width: 2px;
+            height: 25px;
+            background-color: var(--text-color);
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: -5px;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid var(--text-color);
+        }
+
+        /* Nodo condicional / divergente en el flujo final */
+        .flow-split {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .flow-split .flow-node {
+            width: 100%;
+        }
+
+        .split-arrow-container {
+            display: flex;
+            justify-content: center;
+            width: 80%;
+            margin: 0 auto;
+            position: relative;
+            height: 25px;
+        }
+        
+        .split-arrow-left, .split-arrow-right {
+            width: 50%;
+            border-top: 2px solid var(--text-color);
+            position: relative;
+        }
+        .split-arrow-left { border-left: 2px solid var(--text-color); }
+        .split-arrow-right { border-right: 2px solid var(--text-color); }
+
+        .split-arrow-left::after, .split-arrow-right::after {
+            content: '';
+            position: absolute;
+            bottom: -25px;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid var(--text-color);
+        }
+        .split-arrow-left::after { left: -6px; }
+        .split-arrow-right::after { right: -6px; }
+
+
+        @media (max-width: 600px) {
+            .timeline { padding-left: 0; }
+            .timeline::before { left: 18px; }
+            .phase { padding-left: 45px; }
+            .phase::before { left: 0; }
+            h1 { font-size: 1.8rem; }
+            .step-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .citations-group { align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
+            .flow-node { width: 100%; }
+            .flow-split { width: 100%; flex-direction: column; gap: 1rem;}
+            .split-arrow-container { display:none; } /* Ocultar flechas divergentes en móvil por simplicidad visual */
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Proceso Matrimonial Documental</h1>
+        <div class="hierarchy-rule">
+            <strong>Naturaleza Sumarísima:</strong> Procedimiento excepcional regulado por <em>Mitis Iudex Dominus Iesus</em> que omite las solemnidades del proceso ordinario debido a la evidencia irrefutable documental que prueba la nulidad.
+        </div>
+    </header>
+
+    <div class="timeline">
+        
+        <!-- PASO 1: PRESUPUESTOS -->
+        <div class="phase">
+            <h2 class="phase-title">1. Presupuestos y Presentación</h2>
+            
+            <div class="step">
+                <div class="step-header">
+                    Petición Documental Irrefutable
+                    <div class="citations-group">
+                        <span class="badge-mi">MI c. 1688</span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>El proceso comienza tras recibir la petición hecha conforme al c. 1676. Debe basarse estrictamente en un documento al que <strong>no pueda oponerse ninguna objeción ni excepción</strong>.</p>
+                    <p>El documento debe probar con absoluta certeza:</p>
+                    <ul>
+                        <li>La existencia de un <strong>impedimento dirimente</strong>, constando con igual certeza que no se concedió dispensa.</li>
+                        <li>El defecto de <strong>forma legítima</strong>.</li>
+                        <li>La carencia de un <strong>mandato válido</strong> por parte del procurador (en matrimonio por poderes).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 2: CITACIÓN INICIAL -->
+        <div class="phase">
+            <h2 class="phase-title">2. Citación Inicial</h2>
+            
+            <div class="step">
+                <div class="step-header">
+                    Omisión de Solemnidades e Intervención
+                    <div class="citations-group">
+                        <span class="badge-mi">MI c. 1688</span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>Dada la certeza de la prueba, se omiten formalmente las solemnidades del proceso ordinario (ej. interrogatorios extensos, testimonios adicionales).</p>
+                    <p>El Obispo diocesano, el Vicario judicial o el juez designado proceden directamente a <strong>citar a las partes</strong> (demandante y demandada) para garantizar su derecho a réplica.</p>
+                    <p>Es obligatoria e ineludible la intervención del <strong>Defensor del Vínculo</strong>, quien debe revisar el documento para confirmar su peso irrefutable.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 3: DECISIÓN -->
+        <div class="phase">
+            <h2 class="phase-title">3. Decisión</h2>
+            
+            <div class="step">
+                <div class="step-header">
+                    Declaración de Nulidad
+                    <div class="citations-group">
+                        <span class="badge-mi">MI c. 1688</span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>Si el juez, tras la citación y habiendo escuchado al Defensor del Vínculo, verifica que el documento prueba la nulidad incontestablemente, procede de inmediato.</p>
+                    <div class="note">
+                        Se emite <strong>sentencia declarativa de nulidad</strong>, resolviendo la causa en primera instancia de forma ejecutiva (sujeto a las vías de impugnación).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 4: IMPUGNACIÓN Y APELACIÓN -->
+        <div class="phase">
+            <h2 class="phase-title">4. Impugnación</h2>
+            
+            <div class="step">
+                <div class="step-header">
+                    Derecho de Apelación
+                    <div class="citations-group">
+                        <span class="badge-mi">MI c. 1689 §1, §2</span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>Existen dos vías principales de apelación contra esta sentencia documental:</p>
+                    <ul>
+                        <li><strong>Por el Defensor del Vínculo (c. 1689 §1):</strong> Si considera <em>prudentemente</em> que los vicios o la falta de dispensa alegada no son ciertos, <strong>debe apelar</strong> al juez de segunda instancia. Debe advertirse por escrito que es un proceso documental.</li>
+                        <li><strong>Por la parte agraviada (c. 1689 §2):</strong> La parte que se considere perjudicada conserva intacto su derecho a apelar la sentencia.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    Resolución en Segunda Instancia
+                    <div class="citations-group">
+                        <span class="badge-mi">MI c. 1690</span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>El juez de segunda instancia examina la apelación, requiriendo de nuevo la intervención del Defensor del Vínculo y habiendo oído a las partes.</p>
+                    <p>Debe tomar una de las dos decisiones siguientes:</p>
+                    <ul>
+                        <li><strong>Confirmar la sentencia:</strong> Si ratifica que la certeza documental es absoluta.</li>
+                        <li><strong>Remitir al proceso ordinario:</strong> Si nota la falta de evidencia irrefutable documental, decreta que se debe proceder en la causa según el trámite legal ordinario y <strong>la remitirá al tribunal de primera instancia</strong>.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- DIAGRAMA DE FLUJO RESUMEN -->
+    <div class="diagram-container">
+        <h2 class="diagram-title">Resumen del Proceso Documental</h2>
+        
+        <div class="flow-node">
+            1. Petición y Presentación de Documento
+            <span>(Falta de forma / Impedimento no dispensado) MI c. 1688</span>
+        </div>
+        <div class="flow-arrow"></div>
+        
+        <div class="flow-node">
+            2. Citación a las Partes y al Defensor
+            <span>Omisión del trámite ordinario. MI c. 1688</span>
+        </div>
+        <div class="flow-arrow"></div>
+        
+        <div class="flow-node">
+            3. Sentencia Declarativa de Nulidad
+            <span>Emitida por Obispo, Vicario o Juez designado. MI c. 1688</span>
+        </div>
+        <div class="flow-arrow"></div>
+        
+        <div class="flow-node" style="background: #e2e8f0; color: var(--text-color); border: 2px solid var(--text-color);">
+            ¿Existe Apelación? (Defensor o Parte)
+            <span>MI c. 1689</span>
+        </div>
+        <div class="flow-arrow"></div>
+
+        <div class="split-arrow-container">
+            <div class="split-arrow-left"></div>
+            <div class="split-arrow-right"></div>
+        </div>
+
+        <div class="flow-split">
+            <div class="flow-node" style="background: var(--line-color); color: var(--text-color);">
+                NO HAY APELACIÓN
+                <span>La sentencia se hace ejecutiva</span>
+            </div>
+            
+            <div class="flow-node">
+                SÍ HAY APELACIÓN
+                <span>Pasa a Segunda Instancia (MI c. 1690)</span>
+            </div>
+        </div>
+
+        <br><br>
+        
+        <div class="flow-node" style="background: #e2e8f0; color: var(--text-color); border: 2px solid var(--text-color); width:50%;">
+            Decisión del Juez de 2ª Instancia
+            <span>MI c. 1690</span>
+        </div>
+        <div class="flow-arrow"></div>
+        
+        <div class="split-arrow-container">
+            <div class="split-arrow-left"></div>
+            <div class="split-arrow-right"></div>
+        </div>
+
+        <div class="flow-split">
+            <div class="flow-node" style="background: var(--line-color); color: var(--text-color);">
+                Confirma la Sentencia
+                <span>Nulidad declarada firme</span>
+            </div>
+            
+            <div class="flow-node">
+                Falta de Certeza Documental
+                <span>Remite al Trámite Ordinario en 1ª Instancia</span>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

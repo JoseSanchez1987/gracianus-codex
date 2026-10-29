@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proceso Matrimonial Ordinario (Mitis Iudex & Dignitas Connubii)</title>
+    <style>
+        :root {
+            /* Colores corporativos solicitados */
+            --bg-color: #f1f5f9;
+            --text-color: #1e293b;
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+            --shadow-subtle: 0 4px 6px -1px rgba(30, 41, 59, 0.1), 0 2px 4px -2px rgba(30, 41, 59, 0.05);
+            --shadow-hover: 0 10px 15px -3px rgba(30, 41, 59, 0.15), 0 4px 6px -4px rgba(30, 41, 59, 0.1);
+            --line-color: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            padding: 2rem 1rem;
+            -webkit-hyphens: none;
+            -ms-hyphens: none;
+            hyphens: none; /* Regla aplicada: Evitar corte de palabras */
+        }
+
+        header {
+            max-width: 800px;
+            margin: 0 auto 3rem auto;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            line-height: 1.2;
+        }
+
+        .hierarchy-rule {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            box-shadow: var(--shadow-subtle);
+            text-align: left;
+        }
+
+        /* Línea de tiempo vertical */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-left: 1rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 28px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--line-color);
+            border-radius: 2px;
+        }
+
+        .phase {
+            position: relative;
+            margin-bottom: 3rem;
+            padding-left: 60px;
+        }
+
+        .phase::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 5px;
+            width: 24px;
+            height: 24px;
+            background: var(--text-color);
+            border-radius: 50%;
+            border: 4px solid var(--bg-color);
+            z-index: 1;
+        }
+
+        .phase-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-color);
+        }
+
+        .step {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-subtle);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .step:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Estilos de las tarjetas continuas */
+        .step-header {
+            padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .step-body {
+            padding: 1rem 1.5rem 1.5rem 1.5rem;
+            font-size: 0.95rem;
+            color: #334155;
+        }
+
+        .step-body p {
+            margin-bottom: 0.8rem;
+        }
+
+        .step-body ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-body li {
+            margin-bottom: 0.4rem;
+        }
+
+        .note {
+            background-color: #e2e8f0;
+            border-left: 4px solid var(--text-color);
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .badge-mi, .badge-dc {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 0.2rem;
+        }
+
+        .badge-mi {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        .badge-dc {
+            background-color: var(--line-color);
+            color: var(--text-color);
+        }
+
+        .citations-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        /* Estilos para el diagrama de flujo final */
+        .diagram-container {
+            max-width: 800px;
+            margin: 4rem auto;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .diagram-title {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .flow-node {
+            background: var(--text-color);
+            color: var(--bg-color);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            width: 80%;
+            margin: 0 auto;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
+        }
+
+        .flow-node span {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: normal;
+            margin-top: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .flow-arrow {
+            width: 2px;
+            height: 25px;
+            background-color: var(--text-color);
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: -5px;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid var(--text-color);
+        }
+
+        @media (max-width: 600px) {
+            .timeline { padding-left: 0; }
+            .timeline::before { left: 18px; }
+            .phase { padding-left: 45px; }
+            .phase::before { left: 0; }
+            h1 { font-size: 1.8rem; }
+            .step-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .citations-group { align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
+            .flow-node { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Proceso Matrimonial Ordinario</h1>
+        <div class="hierarchy-rule">
+            <strong>Regla de Jerarquía Estricta:</strong> El <em>Mitis Iudex Dominus Iesus</em> (2015) reforma y deroga disposiciones contrarias. <em>Dignitas Connubii</em> (2005) rige exclusivamente en los detalles procedimentales e instructorios no alterados por el Motu Proprio.
+            <br><br>
+            <strong>Cambio Principal:</strong> Ha quedado abolida la exigencia de la doble sentencia conforme.
+        </div>
+    </header>
+
+    <div class="timeline">
+        
+        <!-- FASE 1: INTRODUCTORIA -->
+        <div class="phase">
+            <h2 class="phase-title">1. Fase Introductoria</h2>
+            
+            <div class="step">
+                <div class="step-header">
+                    Presentación del Libelo
+                    <div class="citations-group">
+                        <span class="badge-mi">MI c. 1676 §1</span>
+                        <span class="badge-dc">DC Arts. 114-117</span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>El proceso inicia cuando quien goza del derecho a impugnar el matrimonio presenta un escrito (libelo) ante el tribunal competente (MI c. 1676 §1; DC art. 114).</p>
+                    <p>El documento debe determinar el matrimonio, proponer el capítulo o capítulos de nulidad, e indicar, al menos de modo general, los hechos y pruebas en que se funda (DC art. 116 §1).</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    Admisión o Rechazo
+                    <div class="citations-group">
+                        <span class="badge-dc">DC Arts. 119, 121, 125</span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>El Vicario judicial debe analizar si la demanda goza de algún fundamento. El decreto de admisión o rechazo debe emitirse cuanto antes (DC art. 119 §1).</p>
+                    <p><strong>Plazos (DC art. 125):</strong> Si en <strong>1 mes</strong> desde la presentación el juez no emite el decreto, la parte puede instarle. Si el juez guarda silencio por <strong>10 días</strong> más, se considera admitida automáticamente.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    Citación y Respuesta
+                    <div class="citations-group">
+                        <span class="badge-mi">MI c. 1676 §1</span>
+                        <span class="badge-dc">DC Arts. 126-127</span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>Admitida la demanda, se notifica una copia al Defensor del Vínculo y a la parte demandada (salvo que haya firmado conjuntamente) (MI c. 1676 §1; DC art. 126).</p>
+                    <p><strong>Plazo legal:</strong> El decreto concede a la parte demandada un término de <strong>15 días</strong> para expresar su posición escrita respecto a la demanda (MI c. 1676 §1).</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    Fijación de la Fórmula de Dudas
+                    <div class="citations-group">
+                        <span class="badge-mi">MI c. 1676 §2</span>
+                        <span class="badge-dc">DC Art. 135</span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>Transcurrido el plazo predicho (15 días) y oído el Defensor del Vínculo, el Vicario judicial, mediante decreto, determina la <strong>fórmula de dudas</strong> estableciendo el capítulo o capítulos precisos por los que se impugna la validez (MI c. 1676 §2, 5).</p>
+                    <p>En este paso el Vicario determina también si la causa debe tratarse con el proceso ordinario colegial (o juez único con dos asesores) o con el proceso más breve ante el Obispo (MI c. 1676 §2, 3).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FASE 2: INSTRUCTORIA -->
+        <div class="phase">
+            <h2 class="phase-title">2. Fase Instructoria</h2>
+            
+            <div class="step">
+                <div class="step-header">
+                    Recopilación de Pruebas e Interrogatorios
+                    <div class="citations-group">
+                        <span class="badge-mi">MI cc. 1677-1678</span>
+                        <span class="badge-dc">DC Arts. 155-202</span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>El Juez (o Auditor delegado) ordena la instrucción. La carga de la prueba incumbe a quien afirma (DC art. 156).</p>
+                    <ul>
+                        <li><strong>Exámenes:</strong> Se interroga a partes y testigos por separado, recordando la obligación grave de decir la verdad (DC arts. 165, 167).</li>
+                        <li><strong>Asistencia:</strong> El Defensor del Vínculo y los abogados tienen derecho a asistir a los exámenes de partes, testigos y peritos (MI c. 1677 §1).</li>
+                        <li><strong>Valor Probatorio Pleno:</strong> Según el <em>Mitis Iudex</em>, la confesión judicial y declaraciones de las partes, apoyadas por testigos de credibilidad, pueden constituir prueba plena (MI c. 1678 §1). Incluso la deposición de un solo testigo cualificado puede tener plena fuerza probatoria (MI c. 1678 §2).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    Peritajes Psicológicos o Médicos
+                    <div class="citations-group">
+                        <span class="badge-mi">MI c. 1678 §3</span>
+                        <span class="badge-dc">DC Arts. 203-213</span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>En causas sobre impotencia o defecto de consentimiento por anomalías psíquicas (c. 1095), se recurre al auxilio de uno o varios peritos, a no ser que por las circunstancias resulte evidente inútil (MI c. 1678 §3).</p>
+                    <p><strong>Detalle (DC arts. 207-209):</strong> El juez formula mediante decreto las cuestiones al perito. Éste debe elaborar un dictamen respondiendo según las reglas de su ciencia, pero basándose en los principios de la antropología cristiana. El perito no puede emitir juicios de valor jurídico que corresponden únicamente al juez.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FASE 3: DISCUSORIA -->
+        <div class="phase">
+            <h2 class="phase-title">3. Fase Discusoria</h2>
+            
+            <div class="step">
+                <div class="step-header">
+                    Publicación de las Actas
+                    <div class="citations-group">
+                        <span class="badge-dc">DC Arts. 229-236</span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>Antes de discutir la causa, el juez debe proceder a la publicación de las actas mediante un decreto que concede a las partes y abogados la facultad de examinar en cancillería las pruebas que aún no conocen (DC art. 229).</p>
+                    <p>Una vez publicadas, si es estrictamente necesario, se puede proponer el completar las pruebas (DC art. 236).</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    Conclusión de la Causa
+                    <div class="citations-group">
+                        <span class="badge-dc">DC Arts. 237-239</span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>Se emite decreto de conclusión cuando las partes y el Defensor del Vínculo declaran no tener más que aducir, o vence el plazo fijado (DC art. 237).</p>
+                    <p>A partir de aquí, sólo admiten nuevas pruebas bajo razones gravísimas para evitar una sentencia injusta (DC art. 239).</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    Defensas y Alegatos (Discusión)
+                    <div class="citations-group">
+                        <span class="badge-dc">DC Arts. 240-245</span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>El juez establece el plazo para presentar por escrito las defensas y alegatos (DC art. 240). Posteriormente se permite presentar réplicas (DC art. 242).</p>
+                    <p><strong>Regla Defensor del Vínculo:</strong> Tiene <em>siempre</em> el derecho inalienable de ser oído en último lugar (DC art. 243 §1).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FASE 4: RESOLUTIVA -->
+        <div class="phase">
+            <h2 class="phase-title">4. Fase Resolutiva</h2>
+            
+            <div class="step">
+                <div class="step-header">
+                    Pronunciamiento de la Sentencia
+                    <div class="citations-group">
+                        <span class="badge-mi">MI c. 1679</span>
+                        <span class="badge-dc">DC Arts. 247-250</span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>Los jueces se reúnen para deliberar y deben alcanzar <strong>certeza moral</strong> sobre la nulidad, excluyendo cualquier prudente duda positiva de error (DC art. 247). El ponente redacta la sentencia.</p>
+                    <div class="note">
+                        <strong>MODIFICACIÓN CLAVE (Mitis Iudex):</strong><br> 
+                        La sentencia que por primera vez declara la nulidad del matrimonio, cumplidos los términos de apelación, <strong>se hace ejecutiva directamente</strong> (MI c. 1679). El principio de doble sentencia conforme queda suprimido.
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    Vías de Apelación
+                    <div class="citations-group">
+                        <span class="badge-mi">MI c. 1680</span>
+                        <span class="badge-dc">DC Arts. 279-289</span>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>Permanece íntegro el derecho de la parte perjudicada, del Promotor de Justicia o del Defensor del Vínculo a interponer querella de nulidad o apelación contra la sentencia (MI c. 1680 §1; DC art. 279).</p>
+                    <p><strong>Filtro contra apelaciones abusivas:</strong> Tras recibir la apelación, se constituye el colegio de segunda instancia y se piden observaciones. Si resulta evidente que la apelación es <em>meramente dilatoria</em>, el tribunal colegial confirmará con un decreto la sentencia de primera instancia (MI c. 1680 §2).</p>
+                    <p>Si se admite, se procederá en segunda instancia (MI c. 1680 §3).</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- DIAGRAMA DE FLUJO RESUMEN -->
+    <div class="diagram-container">
+        <h2 class="diagram-title">Resumen del Proceso Ordinario</h2>
+        
+        <div class="flow-node">
+            1. Presentación del Libelo
+            <span>MI c. 1676 §1 | DC art. 114</span>
+        </div>
+        <div class="flow-arrow"></div>
+        
+        <div class="flow-node">
+            2. Admisión de la Demanda
+            <span>Máx. 1 Mes + 10 días de silencio (DC art. 125)</span>
+        </div>
+        <div class="flow-arrow"></div>
+        
+        <div class="flow-node">
+            3. Citación a Parte Demandada
+            <span>15 días para responder (MI c. 1676 §1)</span>
+        </div>
+        <div class="flow-arrow"></div>
+        
+        <div class="flow-node">
+            4. Fijación de Fórmula de Dudas
+            <span>Decreto del Juez (MI c. 1676 §2)</span>
+        </div>
+        <div class="flow-arrow"></div>
+        
+        <div class="flow-node">
+            5. Instrucción de la Causa
+            <span>Interrogatorios, Peritajes, Pruebas (DC art. 155s)</span>
+        </div>
+        <div class="flow-arrow"></div>
+        
+        <div class="flow-node">
+            6. Publicación de Actas
+            <span>Apertura de pruebas a partes (DC art. 229)</span>
+        </div>
+        <div class="flow-arrow"></div>
+        
+        <div class="flow-node">
+            7. Conclusión de la Causa
+            <span>Cierre de fase probatoria (DC art. 237)</span>
+        </div>
+        <div class="flow-arrow"></div>
+        
+        <div class="flow-node">
+            8. Defensas y Alegatos
+            <span>Defensor del Vínculo habla último (DC art. 240s)</span>
+        </div>
+        <div class="flow-arrow"></div>
+        
+        <div class="flow-node">
+            9. Sentencia Definitiva
+            <span>Certeza Moral requerida (DC art. 247)</span>
+        </div>
+        <div class="flow-arrow"></div>
+        
+        <div class="flow-node" style="background: var(--line-color); color: var(--text-color);">
+            10. Ejecución Inmediata
+            <span>(Si no hay apelación) ¡Fin de doble sentencia! (MI c. 1679)</span>
+        </div>
+    </div>
+
+</body>
+</html>
