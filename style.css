@@ -2414,4 +2414,68 @@ mark {
   color: var(--color-navy-dark);
 }
 
+/* Botón Copiar Cita */
+.btn-copiar-cita {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background-color: #f1f5f9;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  font-size: 0.85em;
+  font-family: var(--font-body, inherit);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  line-height: 1.4;
+}
+
+.btn-copiar-cita:hover {
+  background-color: #e2e8f0;
+  border-color: #94a3b8;
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+
+.btn-copiar-cita:active {
+  transform: translateY(0);
+}
+
+.btn-copiar-cita.is-copied {
+  background-color: #f0fdf4;
+  border-color: #86efac;
+}
+
+/* Botón Abrir Esquema */
+.doc-card-featured__btn--open {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-surface, #ffffff);
+  color: var(--color-navy, #1e3a5f);
+  border: 1px solid var(--color-border, #cbd5e1);
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--radius-md, 6px);
+  text-decoration: none;
+  transition: all var(--transition-fast, 0.2s ease);
+}
+
+.doc-card-featured__btn--open:hover {
+  background: var(--color-navy, #1e3a5f);
+  color: #ffffff;
+  border-color: var(--color-navy, #1e3a5f);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 58, 95, 0.20);
+}
+
+.doc-card-featured__btn--open:active {
+  transform: translateY(0);
+}
+
+
+
 
