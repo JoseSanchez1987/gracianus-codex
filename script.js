@@ -259,53 +259,67 @@ document.addEventListener('DOMContentLoaded', () => {
     const canon = findCanon(numero);
     if (!canon) return;
 
-    // Populate detail panel
-    document.getElementById('canonDetailBadge').textContent = canon.capitulo || canon.titulo;
-    document.getElementById('canonDetailTitle').textContent = `Canon ${canon.numero}`;
+    // Populate detail panel safely
+    const badgeEl = document.getElementById('canonDetailBadge');
+    if (badgeEl) badgeEl.textContent = canon.capitulo || canon.titulo || '';
+
+    const titleEl = document.getElementById('canonDetailTitle');
+    if (titleEl) titleEl.textContent = `Canon ${canon.numero}`;
 
     // Meta chips: libro, capítulo, temas
-    const metaHtml = [
-      metaChip('book', canon.libro),
-      ...canon.temas.map(t => metaChip('tag', t))
-    ].join('');
-    document.getElementById('canonDetailMeta').innerHTML = metaHtml;
+    const metaContainer = document.getElementById('canonDetailMeta');
+    if (metaContainer) {
+      let metaHtml = '';
+      if (canon.libro) metaHtml += metaChip('book', canon.libro);
+      if (canon.capitulo && canon.capitulo !== canon.titulo) metaHtml += metaChip('tag', canon.capitulo);
+      if (canon.temas && canon.temas.length > 0) {
+        canon.temas.forEach(t => {
+          metaHtml += metaChip('tag', t);
+        });
+      }
+      metaContainer.innerHTML = metaHtml;
+    }
 
     // Body text
-    document.getElementById('canonDetailBody').textContent = canon.texto;
+    const bodyEl = document.getElementById('canonDetailBody');
+    if (bodyEl) bodyEl.textContent = canon.texto;
 
-    // Enlace a Interpretación Auténtica (si aplica)
-    let interpContainer = document.getElementById('canonDetailInterp');
-    if (!interpContainer) {
-      interpContainer = document.createElement('div');
-      interpContainer.id = 'canonDetailInterp';
-      document.getElementById('canonDetailBody').after(interpContainer);
-    }
-    if (canon.tiene_interpretacion) {
-      interpContainer.innerHTML = `<a href="interpretaciones.html?canon=${canon.numero}" class="enlace-interpretacion" style="display: inline-block; margin-top: 15px; padding: 5px 10px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.85em; text-decoration: none; border: 1px solid #cbd5e1;">◂ Ver Interpretación Auténtica</a>`;
-    } else {
-      interpContainer.innerHTML = '';
+    // Interpretación Auténtica y Copiar Cita
+    const interpContainer = document.getElementById('canonDetailInterp');
+    if (interpContainer) {
+      const copyBtnHtml = `<button type="button" class="btn-copiar-cita" onclick="copiarCitaCanon(this)" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.85em; border: 1px solid #cbd5e1; cursor: pointer;">📋 Copiar Cita</button>`;
+      const interpBtnHtml = canon.tiene_interpretacion
+        ? ` <a href="interpretaciones.html?canon=${canon.numero}" class="enlace-interpretacion" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.85em; text-decoration: none; border: 1px solid #cbd5e1;">◂ Ver Interpretación Auténtica</a>`
+        : '';
+      interpContainer.innerHTML = copyBtnHtml + interpBtnHtml;
     }
 
     // Update navigation controls (Previous / Next)
     updateCanonNav(canon.numero);
 
     // Show detail, hide accordion
-    canonDetail.style.display = 'block';
-    canonDetail.style.animation = 'none';
-    canonDetail.offsetHeight; // reflow
-    canonDetail.style.animation = '';
-    accordionSection.style.display = 'none';
+    if (canonDetail) {
+      canonDetail.style.display = 'block';
+      canonDetail.style.animation = 'none';
+      canonDetail.offsetHeight; // reflow
+      canonDetail.style.animation = '';
+    }
+    if (accordionSection) {
+      accordionSection.style.display = 'none';
+    }
 
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function hideCanonDetail() {
-    canonDetail.style.display = 'none';
-    accordionSection.style.display = '';
+    if (canonDetail) canonDetail.style.display = 'none';
+    if (accordionSection) accordionSection.style.display = '';
   }
 
-  canonDetailBack.addEventListener('click', hideCanonDetail);
+  if (canonDetailBack) {
+    canonDetailBack.addEventListener('click', hideCanonDetail);
+  }
 
   const canonNavPrev = document.getElementById('canonNavPrev');
   const canonNavNext = document.getElementById('canonNavNext');
@@ -363,6 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let searchDebounce = null;
 
   function performSearch() {
+    if (!searchInput || !searchResults) return;
     const query = searchInput.value.trim();
 
     if (!query) {
@@ -401,6 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderSearchResults(results, query) {
+    if (!searchResults) return;
     if (results.length === 0) {
       searchResults.innerHTML = `
         <div class="search-results-inner">
@@ -426,15 +442,16 @@ document.addEventListener('DOMContentLoaded', () => {
       ).join('');
 
       const interpLinkHtml = canon.tiene_interpretacion
-        ? `<div><a href="interpretaciones.html?canon=${canon.numero}" class="enlace-interpretacion" onclick="event.stopPropagation();" style="display: inline-block; margin-top: 10px; padding: 4px 8px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.85em; text-decoration: none; border: 1px solid #cbd5e1;">◂ Ver Interpretación Auténtica</a></div>`
+        ? `<a href="interpretaciones.html?canon=${canon.numero}" class="enlace-interpretacion" onclick="event.stopPropagation();" style="display: inline-block; margin-top: 8px; padding: 4px 8px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.82em; text-decoration: none; border: 1px solid #cbd5e1;">◂ Ver Interpretación Auténtica</a>`
         : '';
 
       return `
-        <div class="search-result-item" data-canon="${canon.numero}" role="button" tabindex="0">
-          <div class="search-result-number">${canon.numero}</div>
+        <div class="search-result-item canon-card" data-canon="${canon.numero}" role="button" tabindex="0">
+          <div class="search-result-number canon-numero">${canon.numero}</div>
           <div class="search-result-content">
             <div class="search-result-title">Canon ${canon.numero}</div>
-            <div class="search-result-excerpt">${highlightedText}</div>
+            <div class="search-result-excerpt canon-texto">${highlightedText}</div>
+            <button type="button" class="btn-copiar-cita" onclick="copiarCitaCanon(this)" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.85em; border: 1px solid #cbd5e1; cursor: pointer;">📋 Copiar Cita</button>
             ${interpLinkHtml}
             <div class="search-result-tags">${tagsHtml}</div>
           </div>
@@ -445,13 +462,13 @@ document.addEventListener('DOMContentLoaded', () => {
     searchResults.innerHTML = `<div class="search-results-inner">${itemsHtml}</div>`;
     searchResults.classList.add('has-results');
 
-    // Bind click handlers
+    // Bind click handlers for search result items
     searchResults.querySelectorAll('.search-result-item').forEach(item => {
       item.addEventListener('click', () => {
         const num = parseInt(item.dataset.canon, 10);
         showCanonDetail(num);
         clearSearchResults();
-        searchInput.value = '';
+        if (searchInput) searchInput.value = '';
       });
       item.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -459,47 +476,53 @@ document.addEventListener('DOMContentLoaded', () => {
           const num = parseInt(item.dataset.canon, 10);
           showCanonDetail(num);
           clearSearchResults();
-          searchInput.value = '';
+          if (searchInput) searchInput.value = '';
         }
       });
     });
   }
 
   function clearSearchResults() {
-    searchResults.innerHTML = '';
-    searchResults.classList.remove('has-results');
+    if (searchResults) {
+      searchResults.innerHTML = '';
+      searchResults.classList.remove('has-results');
+    }
   }
 
-  // Real-time input listener (debounced)
-  searchInput.addEventListener('input', () => {
-    clearTimeout(searchDebounce);
-    searchDebounce = setTimeout(performSearch, 150);
-  });
+  if (searchInput && searchResults) {
+    // Real-time input listener (debounced)
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(performSearch, 150);
+    });
 
-  // Button click also triggers search
-  searchBtn.addEventListener('click', () => {
-    performSearch();
-  });
+    // Button click also triggers search
+    if (searchBtn) {
+      searchBtn.addEventListener('click', () => {
+        performSearch();
+      });
+    }
 
-  // Enter key triggers search
-  searchInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      performSearch();
-    }
-    if (e.key === 'Escape') {
-      clearSearchResults();
-      searchInput.value = '';
-      searchInput.blur();
-    }
-  });
+    // Enter key triggers search
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        performSearch();
+      }
+      if (e.key === 'Escape') {
+        clearSearchResults();
+        searchInput.value = '';
+        searchInput.blur();
+      }
+    });
 
-  // Close results when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.search-container')) {
-      clearSearchResults();
-    }
-  });
+    // Close results when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-container')) {
+        clearSearchResults();
+      }
+    });
+  }
 
   // =====================================================================
   // SUGGESTION TAGS
@@ -507,9 +530,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelectorAll('.suggestion-tag').forEach(tag => {
     tag.addEventListener('click', () => {
-      searchInput.value = tag.dataset.query;
-      searchInput.focus();
-      performSearch();
+      if (searchInput) {
+        searchInput.value = tag.dataset.query;
+        searchInput.focus();
+        performSearch();
+      }
 
       // Visual feedback
       document.querySelectorAll('.suggestion-tag').forEach(t => {
@@ -528,27 +553,33 @@ document.addEventListener('DOMContentLoaded', () => {
   // =====================================================================
 
   function openSidebar() {
-    sidebar.classList.add('open');
-    overlay.classList.add('active');
-    hamburgerBtn.classList.add('active');
+    if (sidebar) sidebar.classList.add('open');
+    if (overlay) overlay.classList.add('active');
+    if (hamburgerBtn) hamburgerBtn.classList.add('active');
     document.body.style.overflow = 'hidden';
   }
 
   function closeSidebar() {
-    sidebar.classList.remove('open');
-    overlay.classList.remove('active');
-    hamburgerBtn.classList.remove('active');
+    if (sidebar) sidebar.classList.remove('open');
+    if (overlay) overlay.classList.remove('active');
+    if (hamburgerBtn) hamburgerBtn.classList.remove('active');
     document.body.style.overflow = '';
   }
 
-  hamburgerBtn.addEventListener('click', () => {
-    sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
-  });
+  if (hamburgerBtn) {
+    hamburgerBtn.addEventListener('click', () => {
+      if (sidebar) {
+        sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+      }
+    });
+  }
 
-  overlay.addEventListener('click', closeSidebar);
+  if (overlay) {
+    overlay.addEventListener('click', closeSidebar);
+  }
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+    if (e.key === 'Escape' && sidebar && sidebar.classList.contains('open')) {
       closeSidebar();
     }
   });
@@ -574,7 +605,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sectionId === 'inicio') {
       hideCanonDetail();
       clearSearchResults();
-      searchInput.value = '';
+      if (searchInput) searchInput.value = '';
     }
 
     if (window.innerWidth <= 768) closeSidebar();
@@ -987,3 +1018,75 @@ document.addEventListener('DOMContentLoaded', () => {
   initColeccionTematica();
 
 });
+
+// =====================================================================
+// FUNCIÓN INDEPENDIENTE: COPIAR CITA (Dicasterio para los Textos Legislativos)
+// =====================================================================
+
+function copiarCitaCanon(boton) {
+  try {
+    if (window.event) {
+      window.event.stopPropagation();
+    }
+
+    // Ajusta '.canon-card', '.canon-numero' y '.canon-texto' a las clases exactas del HTML
+    const tarjeta = boton.closest('.canon-card') || boton.closest('.search-result-item') || boton.closest('.canon-detail');
+    if (!tarjeta) return;
+
+    const numEl = tarjeta.querySelector('.canon-numero') || tarjeta.querySelector('.search-result-number') || tarjeta.querySelector('.canon-detail-title');
+    const textEl = tarjeta.querySelector('.canon-texto') || tarjeta.querySelector('.search-result-excerpt') || tarjeta.querySelector('.canon-detail-body');
+    if (!numEl || !textEl) return;
+
+    const rawNumero = numEl.innerText || numEl.textContent || '';
+    const match = rawNumero.match(/\d+/);
+    const numeroCanon = match ? match[0] : rawNumero.trim();
+
+    const rawTexto = textEl.innerText || textEl.textContent || '';
+    const textoCanon = rawTexto.trim();
+
+    // Estructura oficial: can. XXX CIC: "Texto..."
+    const citaFormateada = `can. ${numeroCanon} CIC: "${textoCanon}"`;
+
+    const handleSuccess = () => {
+      const textoOriginal = boton.innerHTML;
+      if (boton._copyTimeout) {
+        clearTimeout(boton._copyTimeout);
+      }
+      boton.innerHTML = '✅ Cita copiada';
+      boton._copyTimeout = setTimeout(() => {
+        boton.innerHTML = textoOriginal;
+        boton._copyTimeout = null;
+      }, 2000);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(citaFormateada)
+        .then(handleSuccess)
+        .catch(() => {
+          fallbackCopyText(citaFormateada, handleSuccess);
+        });
+    } else {
+      fallbackCopyText(citaFormateada, handleSuccess);
+    }
+  } catch (error) {
+    console.error("Error al copiar la cita: ", error);
+  }
+}
+
+function fallbackCopyText(text, onSuccess) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.left = '-9999px';
+  textarea.style.top = '0';
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  try {
+    const successful = document.execCommand('copy');
+    if (successful && typeof onSuccess === 'function') onSuccess();
+  } catch (err) {
+    console.error('Fallback copy failed: ', err);
+  }
+  document.body.removeChild(textarea);
+}
