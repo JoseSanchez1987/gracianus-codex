@@ -4,21 +4,34 @@
    sidebar navigation, responsive menu
    =================================================================== */
 
+// Global Latin map and loader accessible everywhere
+let latinDataMap = new Map();
+window.latinDataMap = latinDataMap;
+
+function loadLatinData() {
+  if (typeof window.LATIN_RAW_DATA !== 'undefined' && Array.isArray(window.LATIN_RAW_DATA)) {
+    const map = window.latinDataMap || new Map();
+    map.clear();
+    window.LATIN_RAW_DATA.forEach(item => {
+      if (item && item.canon && item.texto_latin) {
+        map.set(String(item.canon).trim(), item.texto_latin);
+      }
+    });
+    window.latinDataMap = map;
+    latinDataMap = map;
+    console.log('Latín cargado con éxito:', map.size, 'cánones');
+  } else {
+    console.warn('El archivo latin_data.js no se cargó correctamente o está vacío.');
+  }
+}
+window.loadLatinData = loadLatinData;
+
+loadLatinData();
+
 document.addEventListener('DOMContentLoaded', () => {
 
   // --- State ---
   let dbData = null; // Loaded JSON data
-  const latinDataMap = new Map(); // Canon number -> Latin text
-  window.latinDataMap = latinDataMap;
-
-  // Immediate sync population from latin_data.js if available
-  if (typeof LATIN_DATA !== 'undefined' && Array.isArray(LATIN_DATA)) {
-    LATIN_DATA.forEach(item => {
-      if (item && item.canon && item.texto_latin) {
-        latinDataMap.set(String(item.canon).trim(), item.texto_latin);
-      }
-    });
-  }
 
   // --- DOM References ---
   const sidebar       = document.getElementById('sidebar');
@@ -101,35 +114,35 @@ document.addEventListener('DOMContentLoaded', () => {
     renderAccordion();
   }
 
-  async function loadLatinData() {
-    try {
-      if (typeof fetch === 'function') {
-        const res = await fetch('latin.json');
-        if (!res.ok) throw new Error('Status ' + res.status);
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          data.forEach(item => {
-            if (item && item.canon && item.texto_latin) {
-              latinDataMap.set(String(item.canon).trim(), item.texto_latin);
-            }
-          });
-        }
-      }
-    } catch (err) {
-      console.warn('latin.json: no se pudo cargar mediante fetch (usando fallback si existe):', err);
-    } finally {
-      // Re-render / inyectar los botones '🇻🇦 LAT' en las tarjetas presentes en el DOM
-      injectLatinButtons();
+  function createLatinButton(canonNum, extraStyle) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-toggle-latin';
+    btn.innerHTML = '🇻🇦 LAT';
+    btn.title = 'Ver en latín';
+    btn.setAttribute('onclick', `event.stopPropagation(); toggleTextoLatin(this, '${canonNum}');`);
+    if (extraStyle) {
+      btn.style.cssText += extraStyle;
     }
+    btn.onclick = function(e) {
+      if (e) e.stopPropagation();
+      toggleTextoLatin(this, canonNum);
+    };
+    return btn;
   }
+  window.createLatinButton = createLatinButton;
 
   function injectLatinButtons() {
     if (!latinDataMap || latinDataMap.size === 0) return;
 
-    // A. Tarjetas en los resultados de búsqueda
-    document.querySelectorAll('.search-result-item[data-canon]').forEach(item => {
-      const canonNum = String(item.dataset.canon).trim();
-      if (latinDataMap.has(canonNum) && !item.querySelector('.btn-toggle-latin')) {
+    // A. Tarjetas en los resultados de búsqueda y tarjetas generales
+    document.querySelectorAll('.search-result-item, .canon-card').forEach(item => {
+      const canonNum = String(
+        item.dataset.canon ||
+        (item.querySelector('.canon-numero') ? item.querySelector('.canon-numero').textContent.replace(/\D/g, '') : '')
+      ).trim();
+
+      if (canonNum && latinDataMap.has(canonNum) && !item.querySelector('.btn-toggle-latin')) {
         const header = item.querySelector('.search-result-header');
         if (header) {
           header.appendChild(createLatinButton(canonNum));
@@ -143,9 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // B. Elementos del acordeón
-    document.querySelectorAll('.accordion-canon-item[data-canon]').forEach(item => {
-      const canonNum = String(item.dataset.canon).trim();
-      if (latinDataMap.has(canonNum) && !item.querySelector('.btn-toggle-latin')) {
+    document.querySelectorAll('.accordion-canon-item').forEach(item => {
+      const canonNum = String(item.dataset.canon || '').trim();
+      if (canonNum && latinDataMap.has(canonNum) && !item.querySelector('.btn-toggle-latin')) {
         const title = item.querySelector('.canon-preview-title');
         if (title) {
           title.style.display = 'flex';
@@ -156,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // C. Vista de detalle del canon
+    // C. Vista de detalle del canon si está abierta
     const detailViewer = document.getElementById('canonDetail');
     if (detailViewer && detailViewer.style.display !== 'none') {
       const titleEl = document.getElementById('canonDetailTitle');
@@ -166,28 +179,14 @@ document.addEventListener('DOMContentLoaded', () => {
           const canonNum = match[0];
           const container = document.getElementById('canonDetailLatBtnContainer');
           if (container && latinDataMap.has(canonNum) && !container.querySelector('.btn-toggle-latin')) {
-            container.innerHTML = `<button type="button" class="btn-toggle-latin" onclick="event.stopPropagation(); toggleTextoLatin(this, '${canonNum}')" title="Ver en latín">🇻🇦 LAT</button>`;
+            container.innerHTML = '';
+            container.appendChild(createLatinButton(canonNum));
           }
         }
       }
     }
   }
-
-  function createLatinButton(canonNum, extraStyle) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'btn-toggle-latin';
-    btn.innerHTML = '🇻🇦 LAT';
-    btn.title = 'Ver en latín';
-    if (extraStyle) {
-      btn.style.cssText += extraStyle;
-    }
-    btn.onclick = function(e) {
-      if (e) e.stopPropagation();
-      toggleTextoLatin(this, canonNum);
-    };
-    return btn;
-  }
+  window.injectLatinButtons = injectLatinButtons;
 
   // =====================================================================
   // ACCORDION RENDERING
@@ -209,17 +208,14 @@ document.addEventListener('DOMContentLoaded', () => {
           const canonItems = (titulo.canones || []).map(num => {
             const canon = findCanon(num);
             if (!canon) return '';
-            const canonNumStr = String(canon.numero).trim();
-            const latinBtn = latinDataMap.has(canonNumStr)
-              ? `<button type="button" class="btn-toggle-latin" onclick="event.stopPropagation(); toggleTextoLatin(this, '${canonNumStr}')" title="Ver en latín" style="margin-left: auto; margin-right: 8px;">🇻🇦 LAT</button>`
-              : '';
+            const latinBtnHtml = createLatinButton(canon.numero, 'margin-left: auto; margin-right: 8px;').outerHTML;
             return `
               <div class="accordion-canon-item" data-canon="${canon.numero}" role="button" tabindex="0" aria-label="Ver Canon ${canon.numero}">
                 <div class="canon-num-badge">${canon.numero}</div>
                 <div class="canon-preview">
                   <div class="canon-preview-title" style="display: flex; align-items: center; justify-content: space-between;">
                     <span>Canon ${canon.numero}</span>
-                    ${latinBtn}
+                    ${latinBtnHtml}
                   </div>
                   <div class="canon-preview-text">${escapeHtml(canon.texto)}</div>
                 </div>
@@ -366,6 +362,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const canon = findCanon(numero);
     if (!canon) return;
 
+    if (canonDetail) {
+      canonDetail.dataset.canon = String(canon.numero);
+    }
+
     // Populate detail panel safely
     const badgeEl = document.getElementById('canonDetailBadge');
     if (badgeEl) badgeEl.textContent = canon.capitulo || canon.titulo || '';
@@ -376,11 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const detailLatContainer = document.getElementById('canonDetailLatBtnContainer');
     if (detailLatContainer) {
-      if (latinDataMap.has(canonNumStr)) {
-        detailLatContainer.innerHTML = `<button type="button" class="btn-toggle-latin" onclick="event.stopPropagation(); toggleTextoLatin(this, '${canonNumStr}')" title="Ver en latín">🇻🇦 LAT</button>`;
-      } else {
-        detailLatContainer.innerHTML = '';
-      }
+      detailLatContainer.innerHTML = createLatinButton(canon.numero).outerHTML;
     }
 
     // Meta chips: libro, capítulo, temas
@@ -399,7 +395,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Body text
     const bodyEl = document.getElementById('canonDetailBody');
-    if (bodyEl) bodyEl.textContent = canon.texto;
+    if (bodyEl) {
+      bodyEl.textContent = canon.texto;
+      delete bodyEl.dataset.textoEspanol;
+    }
 
     // Interpretación Auténtica y Copiar Cita
     const interpContainer = document.getElementById('canonDetailInterp');
@@ -562,10 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ? `<a href="interpretaciones.html?canon=${canon.numero}" class="enlace-interpretacion" onclick="event.stopPropagation();" style="display: inline-block; margin-top: 8px; padding: 4px 8px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.82em; text-decoration: none; border: 1px solid #cbd5e1;">◂ Ver Interpretación Auténtica</a>`
         : '';
 
-      const canonNumStr = String(canon.numero).trim();
-      const latinBtnHtml = latinDataMap.has(canonNumStr)
-        ? `<button type="button" class="btn-toggle-latin" onclick="event.stopPropagation(); toggleTextoLatin(this, '${canonNumStr}')" title="Ver en latín">🇻🇦 LAT</button>`
-        : '';
+      const latinBtnHtml = createLatinButton(canon.numero).outerHTML;
 
       return `
         <div class="search-result-item canon-card" data-canon="${canon.numero}" role="button" tabindex="0">
@@ -586,6 +582,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchResults.innerHTML = `<div class="search-results-inner">${itemsHtml}</div>`;
     searchResults.classList.add('has-results');
+    injectLatinButtons();
 
     // Bind click handlers for search result items
     searchResults.querySelectorAll('.search-result-item').forEach(item => {
@@ -1221,41 +1218,43 @@ function fallbackCopyText(text, onSuccess) {
 // FUNCIÓN INDEPENDIENTE: TOGGLE TEXTO LATÍN (Interruptor Latín / Español)
 // =====================================================================
 
-function toggleTextoLatin(boton, canonNum) {
+window.toggleTextoLatin = function(boton, canonNum) {
   try {
-    if (window.event) {
-      window.event.stopPropagation();
+    if (window.event) window.event.stopPropagation();
+
+    const card = boton.closest('.search-result-item, .canon-card, .accordion-canon-item, #canonDetail, .content-wrapper');
+    const canonStr = String(canonNum || (card ? (card.dataset.canon || card.getAttribute('data-canon')) : '')).trim();
+    const map = (typeof latinDataMap !== 'undefined' && latinDataMap) ? latinDataMap : window.latinDataMap;
+
+    // 1. Lazy Check
+    if (!map || !map.has(canonStr)) {
+      const textoOriginal = boton.innerHTML;
+      boton.innerHTML = '⏳ Cargando...';
+      setTimeout(() => { boton.innerHTML = textoOriginal; }, 1500);
+      return;
     }
 
-    const tarjeta = boton.closest('.canon-card') || boton.closest('.search-result-item') || boton.closest('.canon-detail') || boton.closest('.accordion-canon-item');
-    if (!tarjeta) return;
+    // 2. Búsqueda de contenedor
+    if (!card) return;
 
-    const textoEl = tarjeta.querySelector('.canon-texto') || tarjeta.querySelector('.search-result-excerpt') || tarjeta.querySelector('.canon-detail-body') || tarjeta.querySelector('.canon-preview-text');
-    if (!textoEl) return;
+    const textContainer = card.querySelector('.search-result-excerpt, .canon-texto, .canon-preview-text, #canonDetailText, #canonDetailBody, p');
+    if (!textContainer) return;
 
-    const num = String(canonNum || tarjeta.getAttribute('data-canon') || '').trim();
-    if (!num) return;
-
-    if (!window.latinDataMap || !window.latinDataMap.has(num)) return;
-    const textoLatin = window.latinDataMap.get(num);
-
-    if (boton.dataset.lang === 'la') {
-      // Restaurar español
-      if (boton._textoOriginal !== undefined) {
-        textoEl.innerHTML = boton._textoOriginal;
+    // 3. Lógica de intercambio (Toggle)
+    if (boton.innerHTML.includes('LAT')) {
+      if (!textContainer.dataset.textoEspanol) {
+        textContainer.dataset.textoEspanol = textContainer.innerHTML;
+      }
+      const rawLatin = map.get(canonStr);
+      textContainer.innerHTML = rawLatin.includes('<') ? rawLatin : rawLatin.replace(/\n/g, '<br>');
+      boton.innerHTML = '🇪🇸 ESP';
+    } else {
+      if (textContainer.dataset.textoEspanol) {
+        textContainer.innerHTML = textContainer.dataset.textoEspanol;
       }
       boton.innerHTML = '🇻🇦 LAT';
-      boton.dataset.lang = 'es';
-      boton.title = 'Ver en latín';
-    } else {
-      // Guardar original en español y reemplazar por latín
-      boton._textoOriginal = textoEl.innerHTML;
-      textoEl.innerText = textoLatin;
-      boton.innerHTML = '🇪🇸 ESP';
-      boton.dataset.lang = 'la';
-      boton.title = 'Ver en español';
     }
-  } catch (error) {
-    console.error('Error al alternar texto en latín: ', error);
+  } catch (err) {
+    console.error('Error al alternar texto en latín:', err);
   }
-}
+};
