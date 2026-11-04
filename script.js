@@ -78,16 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function loadData() {
-    if (typeof DB_DATA !== 'undefined') {
-      dbData = DB_DATA;
-      normalizeEstructura(dbData);
-    } else {
-      console.error('DB_DATA not found. Make sure data.js is loaded before script.js.');
-      return;
-    }
-    renderAccordion();
-  }
 
   // =====================================================================
   // ACCORDION RENDERING
@@ -489,64 +479,73 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  if (searchInput && searchResults) {
-    // Real-time input listener (debounced)
-    searchInput.addEventListener('input', () => {
-      clearTimeout(searchDebounce);
-      searchDebounce = setTimeout(performSearch, 150);
-    });
+  function iniciarBuscador() {
+    if (searchInput && searchResults) {
+      searchInput.disabled = false;
 
-    // Button click also triggers search
-    if (searchBtn) {
-      searchBtn.addEventListener('click', () => {
-        performSearch();
+      // Real-time input listener (debounced)
+      searchInput.addEventListener('input', () => {
+        clearTimeout(searchDebounce);
+        searchDebounce = setTimeout(performSearch, 150);
       });
+
+      // Button click also triggers search
+      if (searchBtn) {
+        searchBtn.addEventListener('click', () => {
+          performSearch();
+        });
+      }
+
+      // Enter key triggers search
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          performSearch();
+        }
+        if (e.key === 'Escape') {
+          clearSearchResults();
+          searchInput.value = '';
+          searchInput.blur();
+        }
+      });
+
+      // Close results when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-container')) {
+          clearSearchResults();
+        }
+      });
+
+      // Si el usuario ya introdujo una búsqueda mientras se completaba la carga
+      if (searchInput.value && searchInput.value.trim().length > 0) {
+        performSearch();
+      }
     }
 
-    // Enter key triggers search
-    searchInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        performSearch();
-      }
-      if (e.key === 'Escape') {
-        clearSearchResults();
-        searchInput.value = '';
-        searchInput.blur();
-      }
-    });
+    // =====================================================================
+    // SUGGESTION TAGS
+    // =====================================================================
 
-    // Close results when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.search-container')) {
-        clearSearchResults();
-      }
+    document.querySelectorAll('.suggestion-tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        if (searchInput) {
+          searchInput.value = tag.dataset.query;
+          searchInput.focus();
+          performSearch();
+        }
+
+        // Visual feedback
+        document.querySelectorAll('.suggestion-tag').forEach(t => {
+          t.style.background = '';
+          t.style.borderColor = '';
+          t.style.color = '';
+        });
+        tag.style.background = 'var(--color-accent-soft)';
+        tag.style.borderColor = 'var(--color-accent-border)';
+        tag.style.color = 'var(--color-navy)';
+      });
     });
   }
-
-  // =====================================================================
-  // SUGGESTION TAGS
-  // =====================================================================
-
-  document.querySelectorAll('.suggestion-tag').forEach(tag => {
-    tag.addEventListener('click', () => {
-      if (searchInput) {
-        searchInput.value = tag.dataset.query;
-        searchInput.focus();
-        performSearch();
-      }
-
-      // Visual feedback
-      document.querySelectorAll('.suggestion-tag').forEach(t => {
-        t.style.background = '';
-        t.style.borderColor = '';
-        t.style.color = '';
-      });
-      tag.style.background = 'var(--color-accent-soft)';
-      tag.style.borderColor = 'var(--color-accent-border)';
-      tag.style.color = 'var(--color-navy)';
-    });
-  });
 
   // =====================================================================
   // SIDEBAR NAVIGATION
@@ -1010,12 +1009,46 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =====================================================================
-  // INIT
+  // INICIALIZACIÓN CONCURRENTE (Promise.all)
   // =====================================================================
 
-  loadData();
-  initPeSearch();
-  initColeccionTematica();
+  async function inicializarApp() {
+    try {
+      // Dispara las descargas concurrentemente sin bloquear el hilo principal
+      const [resCanones, resPe] = await Promise.all([
+        fetch('data.json'),
+        fetch('praedicate_evangelium.json')
+      ]);
+
+      const canonesData = await resCanones.json();
+      const peJson = await resPe.json();
+
+      dbData = canonesData;
+      peData = peJson;
+    } catch (error) {
+      console.warn("Fallo en fetch (posible protocolo file://), recurriendo a respaldo en memoria: ", error);
+      if (typeof DB_DATA !== 'undefined') {
+        dbData = DB_DATA;
+      }
+      if (typeof PE_DATA !== 'undefined') {
+        peData = PE_DATA;
+      }
+    }
+
+    if (dbData) {
+      normalizeEstructura(dbData);
+      renderAccordion();
+    }
+
+    // Inicializar módulos complementarios
+    initPeSearch();
+    initColeccionTematica();
+
+    // Habilitar el buscador y sus Event Listeners únicamente tras resolver Promise.all
+    iniciarBuscador();
+  }
+
+  inicializarApp();
 
 });
 
