@@ -87,9 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('DB_DATA not found. Make sure data.js is loaded before script.js.');
       return;
     }
-    setTimeout(() => {
-      renderAccordion();
-    }, 0);
+    renderAccordion();
   }
 
   // =====================================================================
