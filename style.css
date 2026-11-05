@@ -2632,8 +2632,9 @@ mark {
   color: var(--color-text, #2A2A2A);
 }
 
-/* iOS Steps */
-.pwa-ios-steps {
+/* iOS & Desktop Steps */
+.pwa-ios-steps,
+.pwa-desktop-steps {
   background: var(--color-surface, #FFFFFF);
   border: 1px solid var(--color-border-light, #EDE9E3);
   border-radius: var(--radius-md, 10px);
@@ -2644,7 +2645,8 @@ mark {
   gap: 10px;
 }
 
-.pwa-ios-step {
+.pwa-ios-step,
+.pwa-desktop-step {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -2652,6 +2654,18 @@ mark {
   color: var(--color-text, #2A2A2A);
   line-height: 1.35;
   text-align: left !important;
+}
+
+.pwa-action-desktop {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pwa-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .pwa-step-num {
