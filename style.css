@@ -2689,6 +2689,58 @@ mark {
   margin: 0 2px;
 }
 
+/* Fallback box for file:// and non-prompt environments */
+.pwa-fallback-box {
+  background: var(--color-surface, #FFFFFF);
+  border: 1px solid var(--color-border-light, #EDE9E3);
+  border-left: 3px solid var(--color-gold, #C5A059);
+  border-radius: var(--radius-md, 10px);
+  padding: 12px 14px;
+  margin-top: 10px;
+  margin-bottom: 12px;
+  animation: pwaFadeIn 0.3s ease-out forwards;
+}
+
+.pwa-fallback-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--color-gold-dark, #8A6D3B);
+  margin-bottom: 6px;
+}
+
+.pwa-fallback-desc {
+  font-size: 0.82rem;
+  color: var(--color-text-secondary, #5C5C5C);
+  line-height: 1.45;
+  margin: 0 0 8px 0;
+  text-align: left !important;
+}
+
+.pwa-fallback-desc code {
+  font-family: var(--font-mono, monospace);
+  background: rgba(44, 62, 90, 0.08);
+  color: var(--color-navy, #2C3E5A);
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+@keyframes pwaFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 480px) {
   .pwa-install-banner {
     left: 12px;
