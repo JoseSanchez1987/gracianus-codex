@@ -1,22 +1,23 @@
 /**
  * GRACIANUS: CODEX NAVIGATOR — PWA & Install Prompt Manager
- * Native-like install experience for iOS, Android & Desktop browsers (macOS Safari, Chrome, Edge).
+ * Native-like install experience for iOS, Android & Desktop browsers.
  */
 
 (function() {
   'use strict';
 
-  const STORAGE_KEY = 'gracianus_pwa_dismissed';
-  const DISMISS_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+  const STORAGE_KEY = 'gracianus_pwa_v2_dismissed';
+  const DISMISS_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 
-  // Debug check: add ?pwa or ?debug to URL to force prompt display
-  const urlParams = new URLSearchParams(window.location.search);
-  const isDebugMode = urlParams.has('pwa') || urlParams.has('debug') || urlParams.has('install');
+  // Clear legacy 7-day blocker if present
+  try {
+    localStorage.removeItem('gracianus_pwa_dismissed');
+  } catch (e) {}
 
-  // 1. Service Worker Registration (only if supported and on http/https)
+  // 1. Service Worker Registration
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      // Browsers disallow Service Workers on file://
+      // Browsers allow SW on http, https, and localhost
       if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
         navigator.serviceWorker.register('sw.js')
           .then(reg => {
@@ -25,36 +26,26 @@
           .catch(err => {
             console.warn('[PWA] Error al registrar Service Worker:', err);
           });
-      } else {
-        console.log('[PWA] Modo local file:// detectado: el Service Worker requiere http:// o https://.');
       }
     });
   }
 
-  // 2. Standalone Check (already running as standalone app)
+  // 2. Platform & Environment Detection
+  const ua = navigator.userAgent.toLowerCase();
+  const isIOS = (/iphone|ipad|ipod/.test(ua) && !window.MSStream) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
                        window.navigator.standalone === true ||
                        document.referrer.includes('android-app://');
 
-  if (isStandalone && !isDebugMode) {
-    console.log('[PWA] App ejecutándose en modo standalone.');
-    return;
-  }
-
-  // 3. Platform & Protocol Detection
-  const ua = navigator.userAgent.toLowerCase();
-  const isIOS = (/iphone|ipad|ipod/.test(ua) && !window.MSStream) ||
-                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  const isMac = /macintosh|mac os x/.test(ua);
-  const isSafariMac = isMac && /safari/.test(ua) && !/chrome|crios|edg|opr|firefox/.test(ua);
-  const isFileProtocol = window.location.protocol === 'file:';
-
   let deferredPrompt = null;
   let bannerEl = null;
+  let isBannerScheduled = false;
 
-  // 4. Create and inject the modal into the DOM
+  // 3. Create the prompt DOM element
   function createBanner() {
-    if (bannerEl && document.getElementById('pwaInstallBanner')) {
+    if (bannerEl && document.body.contains(bannerEl)) {
       return bannerEl;
     }
 
@@ -73,32 +64,29 @@
           <div class="pwa-ios-steps">
             <div class="pwa-ios-step">
               <span class="pwa-step-num">1</span>
-              <span>Pulsa el botón <strong>Compartir</strong> <svg class="pwa-inline-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> en Safari.</span>
+              <span>Pulsa el botón <strong>Compartir</strong> <svg class="pwa-inline-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> de Safari.</span>
             </div>
             <div class="pwa-ios-step">
               <span class="pwa-step-num">2</span>
-              <span>Elige <strong>«Añadir a pantalla de inicio»</strong> <svg class="pwa-inline-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>.</span>
+              <span>Selecciona <strong>«Añadir a la pantalla de inicio»</strong> <svg class="pwa-inline-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>.</span>
             </div>
           </div>
           <button class="pwa-btn-dismiss" id="pwaBtnDismissIOS" style="width: 100%;">Entendido</button>
         </div>
       `;
     } else {
-      // Standard action row with install & dismiss buttons + dynamic container for fallback
+      // Android / Chromium / Generic action
       actionsHtml = `
-        <div class="pwa-action-container" id="pwaActionContainer">
-          <div id="pwaFallbackContainer"></div>
-          <div class="pwa-action-buttons" id="pwaButtonsRow">
-            <button class="pwa-btn-install" id="pwaBtnInstall">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              Instalar App
-            </button>
-            <button class="pwa-btn-dismiss" id="pwaBtnDismiss">Ahora no</button>
-          </div>
+        <div class="pwa-action-android" id="pwaActionAndroid">
+          <button class="pwa-btn-install" id="pwaBtnInstall">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Instalar App
+          </button>
+          <button class="pwa-btn-dismiss" id="pwaBtnDismiss">Ahora no</button>
         </div>
       `;
     }
@@ -127,116 +115,57 @@
 
     function dismissPrompt() {
       banner.classList.remove('pwa-visible');
-      if (!isDebugMode) {
+      try {
+        sessionStorage.setItem('gracianus_pwa_session_dismissed', '1');
         localStorage.setItem(STORAGE_KEY, Date.now().toString());
-      }
+      } catch (e) {}
+
       setTimeout(() => {
-        if (banner.parentNode) banner.parentNode.removeChild(banner);
+        if (banner.parentNode) {
+          banner.parentNode.removeChild(banner);
+        }
         bannerEl = null;
       }, 400);
     }
 
     // Attach dismissal listeners
     const closeBtn = banner.querySelector('#pwaBannerClose');
-    const dismissBtns = banner.querySelectorAll('.pwa-btn-dismiss');
+    const dismissBtn = banner.querySelector('#pwaBtnDismiss');
+    const dismissIosBtn = banner.querySelector('#pwaBtnDismissIOS');
     const installBtn = banner.querySelector('#pwaBtnInstall');
 
     if (closeBtn) closeBtn.addEventListener('click', dismissPrompt);
-    dismissBtns.forEach(btn => btn.addEventListener('click', dismissPrompt));
+    if (dismissBtn) dismissBtn.addEventListener('click', dismissPrompt);
+    if (dismissIosBtn) dismissIosBtn.addEventListener('click', dismissPrompt);
 
     if (installBtn) {
       installBtn.addEventListener('click', async () => {
-        // 1. Verificación del entorno: si beforeinstallprompt está disponible (HTTPS / localhost válido)
         if (deferredPrompt) {
           try {
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-            console.log('[PWA] Respuesta del usuario a la instalación:', outcome);
+            console.log('[PWA] Respuesta del usuario:', outcome);
             deferredPrompt = null;
           } catch (err) {
-            console.warn('[PWA] Error al ejecutar deferredPrompt:', err);
+            console.warn('[PWA] Error en prompt:', err);
           }
           dismissPrompt();
-          return;
-        }
-
-        // 2. Fallback elegante sin alert()
-        const fallbackContainer = banner.querySelector('#pwaFallbackContainer');
-        const buttonsRow = banner.querySelector('#pwaButtonsRow');
-        if (!fallbackContainer) return;
-
-        let fallbackHtml = '';
-
-        if (isFileProtocol) {
-          // Entorno local file:///
-          fallbackHtml = `
-            <div class="pwa-fallback-box">
-              <div class="pwa-fallback-badge">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                Protocolo Local (file:///)
-              </div>
-              <p class="pwa-fallback-desc">
-                Los navegadores requieren un servidor con origen seguro (<code>https://</code> o <code>http://localhost</code>) para habilitar la instalación automática con un clic.
-              </p>
-              ${isSafariMac ? `
-                <div class="pwa-desktop-steps">
-                  <div class="pwa-desktop-step">
-                    <span class="pwa-step-num">1</span>
-                    <span>En Safari Mac puedes anclarla ya: ve a <strong>Archivo</strong> en la barra superior.</span>
-                  </div>
-                  <div class="pwa-desktop-step">
-                    <span class="pwa-step-num">2</span>
-                    <span>Haz clic en <strong>«Añadir al Dock…»</strong> para tenerla como app independiente.</span>
-                  </div>
-                </div>
-              ` : `
-                <p class="pwa-fallback-desc" style="font-size: 0.8rem; color: var(--color-slate, #5A6577); margin-bottom: 0;">
-                  💡 <strong>Para instalar con 1 clic en Chrome/Edge:</strong> Inicia un servidor local rápido (ej. Live Server de VS Code o <code>python3 -m http.server</code>) o alójala en un servidor seguro con <code>https://</code>.
-                </p>
-              `}
-            </div>
-          `;
         } else {
-          // Entorno HTTP o navegador que no dispara beforeinstallprompt
-          fallbackHtml = `
-            <div class="pwa-fallback-box">
-              <div class="pwa-fallback-badge">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                Pasos de instalación
+          // If native prompt is not active, display guidance smoothly inside the card
+          const actionContainer = banner.querySelector('#pwaActionAndroid');
+          if (actionContainer) {
+            actionContainer.innerHTML = `
+              <div class="pwa-ios-steps" style="margin-bottom: 8px;">
+                <div class="pwa-ios-step">
+                  <span class="pwa-step-num">1</span>
+                  <span>Abre el menú del navegador (<strong>⋮</strong>) y pulsa <strong>«Instalar aplicación»</strong> o <strong>«Añadir a pantalla de inicio»</strong>.</span>
+                </div>
               </div>
-              ${isSafariMac ? `
-                <div class="pwa-desktop-steps">
-                  <div class="pwa-desktop-step">
-                    <span class="pwa-step-num">1</span>
-                    <span>En el menú de Safari, ve a <strong>Archivo</strong>.</span>
-                  </div>
-                  <div class="pwa-desktop-step">
-                    <span class="pwa-step-num">2</span>
-                    <span>Selecciona <strong>«Añadir al Dock…»</strong>.</span>
-                  </div>
-                </div>
-              ` : `
-                <div class="pwa-desktop-steps">
-                  <div class="pwa-desktop-step">
-                    <span class="pwa-step-num">1</span>
-                    <span>Busca el icono de <strong>Instalar</strong> en la barra de direcciones o en el menú de opciones (<strong>⋮</strong>).</span>
-                  </div>
-                </div>
-              `}
-            </div>
-          `;
-        }
-
-        // Render fallback content smoothly
-        fallbackContainer.innerHTML = fallbackHtml;
-
-        // Transition the button row to a single "Entendido" button
-        if (buttonsRow) {
-          buttonsRow.innerHTML = `
-            <button class="pwa-btn-dismiss" id="pwaBtnDismissUnderstood" style="width: 100%;">Entendido</button>
-          `;
-          const understoodBtn = buttonsRow.querySelector('#pwaBtnDismissUnderstood');
-          if (understoodBtn) understoodBtn.addEventListener('click', dismissPrompt);
+              <button class="pwa-btn-dismiss" id="pwaBtnDismissAlt" style="width: 100%;">Entendido</button>
+            `;
+            const altDismiss = banner.querySelector('#pwaBtnDismissAlt');
+            if (altDismiss) altDismiss.addEventListener('click', dismissPrompt);
+          }
         }
       });
     }
@@ -244,61 +173,83 @@
     return banner;
   }
 
+  // 4. Show the banner with visibility transition
   function showBanner(force = false) {
-    if (!force && !isDebugMode) {
-      const lastDismissed = localStorage.getItem(STORAGE_KEY);
-      if (lastDismissed) {
-        const elapsed = Date.now() - parseInt(lastDismissed, 10);
-        if (!isNaN(elapsed) && elapsed < DISMISS_DURATION_MS) {
-          return; // Dismissed recently
-        }
+    if (!force) {
+      // Don't show if already installed and running standalone
+      if (isStandalone) {
+        return;
       }
+
+      // Check session and local dismissal
+      try {
+        if (sessionStorage.getItem('gracianus_pwa_session_dismissed')) {
+          return;
+        }
+        const lastDismissed = localStorage.getItem(STORAGE_KEY);
+        if (lastDismissed) {
+          const elapsed = Date.now() - parseInt(lastDismissed, 10);
+          if (!isNaN(elapsed) && elapsed < DISMISS_DURATION_MS) {
+            return;
+          }
+        }
+      } catch (e) {}
+    }
+
+    if (!document.body) {
+      document.addEventListener('DOMContentLoaded', () => showBanner(force));
+      return;
     }
 
     const banner = createBanner();
+    if (!banner) return;
+
+    // Double requestAnimationFrame ensures reliable transition trigger
     requestAnimationFrame(() => {
-      setTimeout(() => {
-        if (banner) banner.classList.add('pwa-visible');
-      }, 100);
+      requestAnimationFrame(() => {
+        banner.classList.add('pwa-visible');
+      });
     });
   }
 
-  // 5. Native beforeinstallprompt (Android / Desktop Chrome / Edge over HTTPS or localhost)
+  // 5. Schedule banner trigger safely
+  function scheduleBanner(delayMs = 2000) {
+    if (isBannerScheduled) return;
+    isBannerScheduled = true;
+    setTimeout(() => {
+      showBanner(false);
+    }, delayMs);
+  }
+
+  // 6. Listen for Android/Chromium beforeinstallprompt
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    console.log('[PWA] Evento beforeinstallprompt capturado con éxito');
-
-    // If banner is already created, make sure it is ready
-    if (!bannerEl) {
-      setTimeout(() => showBanner(false), 1500);
-    }
+    console.log('[PWA] Evento beforeinstallprompt capturado');
+    scheduleBanner(1200);
   });
 
-  // 6. Unified Auto-trigger on page load
-  // Ensures macOS Safari, iOS, and Desktop browsers always receive the prompt
-  function initAutoPrompt() {
-    setTimeout(() => {
-      showBanner(false);
-    }, 1500);
-  }
-
+  // 7. General trigger on page ready (iOS & general fallback)
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAutoPrompt);
+    document.addEventListener('DOMContentLoaded', () => {
+      scheduleBanner(2500);
+    });
   } else {
-    initAutoPrompt();
+    scheduleBanner(2500);
   }
 
-  // 7. App installed event listener
+  // 8. Event when app is successfully installed
   window.addEventListener('appinstalled', () => {
     if (bannerEl) {
       bannerEl.classList.remove('pwa-visible');
     }
-    localStorage.setItem(STORAGE_KEY, Date.now().toString());
+    try {
+      localStorage.setItem(STORAGE_KEY, Date.now().toString());
+    } catch (e) {}
     console.log('[PWA] Gracianus: Codex Navigator ha sido instalada con éxito.');
   });
 
-  // 8. Global helper for manual debugging or button trigger
+  // 9. Global manual helper for instant verification
   window.gracianusShowInstallPrompt = function(force = true) {
     showBanner(force);
   };
