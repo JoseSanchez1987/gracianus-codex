@@ -19,7 +19,7 @@
     window.addEventListener('load', () => {
       // Browsers allow SW on http, https, and localhost
       if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
-        navigator.serviceWorker.register('sw.js')
+        navigator.serviceWorker.register('./sw.js', { scope: './' })
           .then(reg => {
             console.log('[PWA] Service Worker registrado con éxito:', reg.scope);
           })
@@ -96,7 +96,7 @@
         <button class="pwa-banner-close" id="pwaBannerClose" aria-label="Cerrar sugerencia de instalación">✕</button>
         <div class="pwa-banner-header">
           <div class="pwa-banner-icon">
-            <img src="assets/icon-192.png" alt="Icono Gracianus" width="42" height="42">
+            <img src="./assets/icon-192.png" alt="Icono Gracianus" width="42" height="42">
           </div>
           <div class="pwa-banner-title-box">
             <h4 class="pwa-banner-title">Gracianus: Codex Navigator</h4>

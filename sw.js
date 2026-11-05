@@ -1,6 +1,6 @@
-const CACHE_NAME = 'gracianus-v1';
+const CACHE_NAME = 'gracianus-v2';
 
-const STATIC_ASSETS = [
+const urlsToCache = [
   './',
   './index.html',
   './style.css',
@@ -27,12 +27,14 @@ const STATIC_ASSETS = [
   './assets/icon-512.png'
 ];
 
-// Install Event — Pre-caching static assets & JSON files
+const STATIC_ASSETS = urlsToCache;
+
+// Install Event — Pre-caching static assets & JSON files with relative URLs
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return Promise.allSettled(
-        STATIC_ASSETS.map(url => cache.add(url))
+        urlsToCache.map(url => cache.add(url))
       );
     }).then(() => self.skipWaiting())
   );
@@ -45,6 +47,7 @@ self.addEventListener('activate', event => {
       return Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
+            console.log('[SW] Purgando caché obsoleta:', key);
             return caches.delete(key);
           }
         })
@@ -70,7 +73,7 @@ self.addEventListener('fetch', event => {
   if (url.pathname.endsWith('.json')) {
     event.respondWith(
       caches.open(CACHE_NAME).then(cache => {
-        return cache.match(request).then(cachedResponse => {
+        return cache.match(request, { ignoreSearch: true }).then(cachedResponse => {
           const fetchPromise = fetch(request)
             .then(networkResponse => {
               if (networkResponse && networkResponse.status === 200) {
@@ -89,14 +92,14 @@ self.addEventListener('fetch', event => {
 
   // Strategy 2: Static assets (HTML, CSS, JS, Images, Fonts) -> Cache First with Network Fallback
   event.respondWith(
-    caches.match(request).then(cachedResponse => {
+    caches.match(request, { ignoreSearch: true }).then(cachedResponse => {
       if (cachedResponse) {
         return cachedResponse;
       }
 
       return fetch(request)
         .then(networkResponse => {
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+          if (!networkResponse || networkResponse.status !== 200) {
             return networkResponse;
           }
 
