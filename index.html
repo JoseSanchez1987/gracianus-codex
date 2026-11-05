@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Gracianus: Codex Navigator</title>
   <meta name="description" content="Plataforma de consulta y búsqueda de textos jurídico-canónicos. Accede al Código de Derecho Canónico, documentos pontificios y recursos académicos.">
   
@@ -771,16 +771,6 @@
   <script src="temas_data.js"></script>
   <script src="latin_data.js"></script>
   <script src="script.js"></script>
-
-  <!-- PWA Service Worker Registration -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(reg => console.log('[PWA] Service Worker registrado con éxito:', reg.scope))
-          .catch(err => console.warn('[PWA] Error al registrar Service Worker:', err));
-      });
-    }
-  </script>
+  <script src="pwa.js" defer></script>
 </body>
 </html>

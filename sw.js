@@ -5,6 +5,7 @@ const STATIC_ASSETS = [
   './index.html',
   './style.css',
   './script.js',
+  './pwa.js',
   './data.js',
   './temas_data.js',
   './latin_data.js',
