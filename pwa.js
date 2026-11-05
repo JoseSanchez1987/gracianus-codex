@@ -254,4 +254,50 @@
     showBanner(force);
   };
 
+  // 10. Permanent sidebar install button trigger
+  function initSidebarButton() {
+    const sidebarBtn = document.getElementById('sidebarInstallBtn');
+    if (!sidebarBtn) return;
+
+    sidebarBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      // Close mobile drawer if open so modal or native prompt is fully visible
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      if (sidebar && sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+        if (hamburgerBtn) hamburgerBtn.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      // If native beforeinstallprompt is available (Android / Chrome)
+      if (deferredPrompt) {
+        console.log('[PWA] Disparando instalación nativa desde la barra lateral...');
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(choice => {
+          console.log('[PWA] Respuesta del usuario a la instalación:', choice.outcome);
+          if (choice.outcome === 'accepted') {
+            deferredPrompt = null;
+          }
+        }).catch(err => {
+          console.warn('[PWA] Error al disparar prompt nativo:', err);
+          showBanner(true);
+        });
+      } else {
+        // iOS Safari, desktop or prompt already used/unavailable
+        console.log('[PWA] Prompt nativo no disponible; forzando tarjeta flotante con instrucciones...');
+        showBanner(true);
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSidebarButton);
+  } else {
+    initSidebarButton();
+  }
+
 })();

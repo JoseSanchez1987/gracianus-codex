@@ -311,6 +311,46 @@ p {
   padding: 20px 28px calc(24px + env(safe-area-inset-bottom, 0px));
 }
 
+.sidebar-install-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  background: var(--color-navy, #2C3E5A);
+  color: #ffffff;
+  border: 1px solid var(--color-navy-dark, #1E2D42);
+  border-radius: var(--radius-md, 10px);
+  font-family: var(--font-body);
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(44, 62, 90, 0.16);
+  transition: all 0.2s ease;
+}
+
+.sidebar-install-btn:hover {
+  background: var(--color-navy-dark, #1E2D42);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(44, 62, 90, 0.25);
+}
+
+.sidebar-install-btn:active {
+  transform: translateY(0);
+}
+
+.sidebar-install-btn svg {
+  flex-shrink: 0;
+  stroke: currentColor;
+}
+
+.sidebar-footer .sidebar-divider {
+  margin: 0 0 12px 0;
+}
+
 .footer-text {
   font-size: 0.72rem;
   color: var(--color-text-muted);
