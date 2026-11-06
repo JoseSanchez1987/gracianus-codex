@@ -2490,30 +2490,59 @@ mark {
 }
 
 /* ===================================================================
-   INTERRUPTOR LATÍN / ESPAÑOL (TOGGLE)
+   PESTAÑAS MULTILINGÜES DE CÁNONES (TABS — PÍLDORA DISCRETA)
    =================================================================== */
 
-.btn-toggle-latin {
-  display: inline-flex;
+.canon-title-row {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #1e293b;
-  background-color: #f1f5f9;
-  border: 1px solid #cbd5e1;
-  border-radius: 5px;
-  cursor: pointer;
-  line-height: 1.2;
-  transition: all 0.15s ease;
-  user-select: none;
+  gap: 8px;
+  margin-bottom: 4px;
 }
 
-.btn-toggle-latin:hover {
-  background-color: #e2e8f0;
-  border-color: #94a3b8;
-  color: #0f172a;
+.canon-detail-header .canon-title-row {
+  margin-bottom: 0;
+}
+
+.canon-title-row .canon-detail-title,
+.canon-title-row .canon-preview-title,
+.canon-title-row .search-result-title {
+  margin: 0;
+}
+
+.lang-tabs-container {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 0;
+  border-bottom: none;
+  flex-shrink: 0;
+}
+
+.lang-tab {
+  background: #f7f7f7;
+  border: 1px solid #eaeaea;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #a0a0a0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  line-height: 1.3;
+}
+
+.lang-tab:hover {
+  color: #666;
+  border-color: #ccc;
+}
+
+.lang-tab.active {
+  background: #fff;
+  color: #1a365d;
+  border-color: #1a365d;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 /* ===================================================================

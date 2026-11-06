@@ -1,9 +1,8 @@
-const CACHE_NAME = 'gracianus-v4';
+const CACHE_NAME = 'gracianus-v8';
 
-// Absolute URLs derived from the SW location (/gracianus-codex/sw.js).
-// They match the manifest's start_url / scope byte-for-byte.
-const SCOPE_URL = new URL('./', self.location).href;            // https://<user>.github.io/gracianus-codex/
-const START_URL = new URL('./index.html', self.location).href;  // https://<user>.github.io/gracianus-codex/index.html
+// Relative URLs resolved against sw.js scope (works both in local dev and GitHub Pages subdirectory).
+const SCOPE_URL = './';
+const START_URL = './index.html';
 
 const urlsToCache = [
   './',
@@ -11,6 +10,7 @@ const urlsToCache = [
   './style.css',
   './script.js',
   './pwa.js',
+  './data_multilingue_final.json',
   './data.js',
   './temas_data.js',
   './latin_data.js',

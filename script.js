@@ -4,34 +4,20 @@
    sidebar navigation, responsive menu
    =================================================================== */
 
-// Global Latin map and loader accessible everywhere
-let latinDataMap = new Map();
-window.latinDataMap = latinDataMap;
-
-function loadLatinData() {
-  if (typeof window.LATIN_RAW_DATA !== 'undefined' && Array.isArray(window.LATIN_RAW_DATA)) {
-    const map = window.latinDataMap || new Map();
-    map.clear();
-    window.LATIN_RAW_DATA.forEach(item => {
-      if (item && item.canon && item.texto_latin) {
-        map.set(String(item.canon).trim(), item.texto_latin);
-      }
-    });
-    window.latinDataMap = map;
-    latinDataMap = map;
-    console.log('Latín cargado con éxito:', map.size, 'cánones');
-  } else {
-    console.warn('El archivo latin_data.js no se cargó correctamente o está vacío.');
-  }
-}
-window.loadLatinData = loadLatinData;
-
-loadLatinData();
-
 document.addEventListener('DOMContentLoaded', () => {
 
   // --- State ---
-  let dbData = null; // Loaded JSON data
+  let dbData = null; // Loaded multilingual JSON data
+  const canonMap = new Map(); // Fast O(1) lookup by canon number
+
+  // Strict language tab order & JSON property mapping (state is local per canon card)
+  const LANG_TABS = [
+    { label: 'ES',  prop: 'texto' },
+    { label: 'LAT', prop: 'texto_latin' },
+    { label: 'EN',  prop: 'texto_ingles' },
+    { label: 'IT',  prop: 'texto_italiano' },
+    { label: 'FR',  prop: 'texto_frances' }
+  ];
 
   // --- DOM References ---
   const sidebar       = document.getElementById('sidebar');
@@ -103,90 +89,137 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 
-  function loadData() {
-    if (typeof DB_DATA !== 'undefined') {
-      dbData = DB_DATA;
-      normalizeEstructura(dbData);
-    } else {
-      console.error('DB_DATA not found. Make sure data.js is loaded before script.js.');
+  function loadScriptFallback(src) {
+    return new Promise((resolve) => {
+      if (window.DB_MULTILINGUE_DATA) {
+        resolve(window.DB_MULTILINGUE_DATA);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = () => resolve(window.DB_MULTILINGUE_DATA || null);
+      script.onerror = () => resolve(null);
+      document.head.appendChild(script);
+    });
+  }
+
+  async function loadData() {
+    let loaded = null;
+
+    // 1. Primary: fetch ./data_multilingue_final.json over HTTP/HTTPS
+    if (window.location.protocol !== 'file:') {
+      try {
+        const res = await fetch('./data_multilingue_final.json');
+        if (res.ok) {
+          loaded = await res.json();
+        }
+      } catch (err) {
+        // Fallback below if fetch is blocked or unavailable
+      }
+    }
+
+    // 2. Local file:// fallback so opening index.html directly from disk also works
+    if (!loaded) {
+      loaded = await loadScriptFallback('./data_multilingue_final.js');
+    }
+
+    if (!loaded) {
+      console.error('No se pudo cargar data_multilingue_final.json.');
+      if (accordionContainer) {
+        accordionContainer.innerHTML = '<div class="accordion-empty">Error al cargar la base de datos de cánones.</div>';
+      }
       return;
     }
+
+    // Support both { estructura, canones } and direct array structures
+    dbData = Array.isArray(loaded) ? { estructura: [], canones: loaded } : loaded;
+    if (!Array.isArray(dbData.canones)) {
+      console.error('Formato inválido en data_multilingue_final.json: falta el array canones.');
+      return;
+    }
+
+    if (Array.isArray(dbData.estructura) && dbData.estructura.length > 0) {
+      normalizeEstructura(dbData);
+    }
+
+    canonMap.clear();
+    dbData.canones.forEach(c => {
+      if (c && c.numero !== undefined) {
+        canonMap.set(Number(c.numero), c);
+      }
+    });
+
     renderAccordion();
-  }
 
-  function createLatinButton(canonNum, extraStyle) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'btn-toggle-latin';
-    btn.innerHTML = '🇻🇦 LAT';
-    btn.title = 'Ver en latín';
-    btn.setAttribute('onclick', `event.stopPropagation(); toggleTextoLatin(this, '${canonNum}');`);
-    if (extraStyle) {
-      btn.style.cssText += extraStyle;
+    if (searchInput && searchInput.value.trim()) {
+      performSearch();
     }
-    btn.onclick = function(e) {
-      if (e) e.stopPropagation();
-      toggleTextoLatin(this, canonNum);
-    };
-    return btn;
   }
-  window.createLatinButton = createLatinButton;
 
-  function injectLatinButtons() {
-    if (!latinDataMap || latinDataMap.size === 0) return;
+  // =====================================================================
+  // MULTILINGUAL TABS RENDERING & INDEPENDENT CARD LISTENERS
+  // =====================================================================
 
-    // A. Tarjetas en los resultados de búsqueda y tarjetas generales
-    document.querySelectorAll('.search-result-item, .canon-card').forEach(item => {
-      const canonNum = String(
-        item.dataset.canon ||
-        (item.querySelector('.canon-numero') ? item.querySelector('.canon-numero').textContent.replace(/\D/g, '') : '')
-      ).trim();
+  function hasValidLangText(canon, prop) {
+    return Boolean(canon && typeof canon[prop] === 'string' && canon[prop].trim() !== '');
+  }
 
-      if (canonNum && latinDataMap.has(canonNum) && !item.querySelector('.btn-toggle-latin')) {
-        const header = item.querySelector('.search-result-header');
-        if (header) {
-          header.appendChild(createLatinButton(canonNum));
+  function buildLangTabsButtonsHtml(canon) {
+    if (!canon) return '';
+    return LANG_TABS.map(lang => {
+      if (!hasValidLangText(canon, lang.prop)) return '';
+      const isSpanishDefault = lang.prop === 'texto';
+      return `<button type="button" class="lang-tab${isSpanishDefault ? ' active' : ''}" data-prop="${lang.prop}" data-canon="${canon.numero}" aria-selected="${isSpanishDefault}">${lang.label}</button>`;
+    }).join('');
+  }
+
+  function buildLangTabsContainerHtml(canon) {
+    const buttonsHtml = buildLangTabsButtonsHtml(canon);
+    if (!buttonsHtml) return '';
+    return `<div class="lang-tabs-container">${buttonsHtml}</div>`;
+  }
+
+  function bindLangTabs(rootEl) {
+    if (!rootEl) return;
+    rootEl.querySelectorAll('.lang-tab').forEach(tab => {
+      if (tab.dataset.bound === '1') return;
+      tab.dataset.bound = '1';
+
+      tab.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const prop = tab.dataset.prop;
+        const canonNum = parseInt(tab.dataset.canon, 10);
+        if (!prop || Number.isNaN(canonNum)) return;
+
+        const canon = findCanon(canonNum);
+        if (!hasValidLangText(canon, prop)) return;
+
+        const newText = canon[prop];
+        const tabsContainer = tab.closest('.lang-tabs-container');
+        if (!tabsContainer) return;
+
+        // Toggle .active exclusively among tabs inside this canon card
+        tabsContainer.querySelectorAll('.lang-tab').forEach(sibling => {
+          const isCurrent = sibling === tab;
+          sibling.classList.toggle('active', isCurrent);
+          sibling.setAttribute('aria-selected', String(isCurrent));
+        });
+
+        // Update only the text container belonging to this specific canon card
+        const card = tab.closest('#canonDetail, .search-result-item, .accordion-canon-item, .canon-card');
+        const textEl = card ? card.querySelector('.canon-detail-body, .search-result-excerpt, .canon-preview-text, .canon-texto') : null;
+        if (!textEl) return;
+
+        if (textEl.classList.contains('search-result-excerpt') && textEl.dataset.query) {
+          textEl.innerHTML = highlightMatch(newText, textEl.dataset.query);
         } else {
-          const title = item.querySelector('.search-result-title');
-          if (title) {
-            title.parentNode.insertBefore(createLatinButton(canonNum), title.nextSibling);
-          }
+          textEl.textContent = newText;
         }
-      }
+      });
     });
-
-    // B. Elementos del acordeón
-    document.querySelectorAll('.accordion-canon-item').forEach(item => {
-      const canonNum = String(item.dataset.canon || '').trim();
-      if (canonNum && latinDataMap.has(canonNum) && !item.querySelector('.btn-toggle-latin')) {
-        const title = item.querySelector('.canon-preview-title');
-        if (title) {
-          title.style.display = 'flex';
-          title.style.alignItems = 'center';
-          title.style.justifyContent = 'space-between';
-          title.appendChild(createLatinButton(canonNum, 'margin-left: auto; margin-right: 8px;'));
-        }
-      }
-    });
-
-    // C. Vista de detalle del canon si está abierta
-    const detailViewer = document.getElementById('canonDetail');
-    if (detailViewer && detailViewer.style.display !== 'none') {
-      const titleEl = document.getElementById('canonDetailTitle');
-      if (titleEl) {
-        const match = (titleEl.textContent || '').match(/\d+/);
-        if (match) {
-          const canonNum = match[0];
-          const container = document.getElementById('canonDetailLatBtnContainer');
-          if (container && latinDataMap.has(canonNum) && !container.querySelector('.btn-toggle-latin')) {
-            container.innerHTML = '';
-            container.appendChild(createLatinButton(canonNum));
-          }
-        }
-      }
-    }
   }
-  window.injectLatinButtons = injectLatinButtons;
 
   // =====================================================================
   // ACCORDION RENDERING
@@ -208,16 +241,15 @@ document.addEventListener('DOMContentLoaded', () => {
           const canonItems = (titulo.canones || []).map(num => {
             const canon = findCanon(num);
             if (!canon) return '';
-            const latinBtnHtml = createLatinButton(canon.numero, 'margin-left: auto; margin-right: 8px;').outerHTML;
             return `
               <div class="accordion-canon-item" data-canon="${canon.numero}" role="button" tabindex="0" aria-label="Ver Canon ${canon.numero}">
                 <div class="canon-num-badge">${canon.numero}</div>
                 <div class="canon-preview">
-                  <div class="canon-preview-title" style="display: flex; align-items: center; justify-content: space-between;">
-                    <span>Canon ${canon.numero}</span>
-                    ${latinBtnHtml}
+                  <div class="canon-title-row">
+                    <h3 class="canon-preview-title">Canon ${canon.numero}</h3>
+                    ${buildLangTabsContainerHtml(canon)}
                   </div>
-                  <div class="canon-preview-text">${escapeHtml(canon.texto)}</div>
+                  <div class="canon-preview-text canon-texto">${escapeHtml(canon.texto || '')}</div>
                 </div>
                 <svg class="canon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="5" y1="12" x2="19" y2="12"/>
@@ -265,6 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     accordionContainer.innerHTML = html;
     bindAccordionEvents();
+    bindLangTabs(accordionContainer);
   }
 
   function bindAccordionEvents() {
@@ -299,11 +332,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Canon item clicks
     accordionContainer.querySelectorAll('.accordion-canon-item').forEach(item => {
-      item.addEventListener('click', () => {
+      item.addEventListener('click', (e) => {
+        if (e.target.closest('.lang-tabs-container')) return;
         const num = parseInt(item.dataset.canon, 10);
         showCanonDetail(num);
       });
       item.addEventListener('keydown', (e) => {
+        if (e.target.closest('.lang-tabs-container')) return;
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           const num = parseInt(item.dataset.canon, 10);
@@ -370,14 +405,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const badgeEl = document.getElementById('canonDetailBadge');
     if (badgeEl) badgeEl.textContent = canon.capitulo || canon.titulo || '';
 
-    const canonNumStr = String(canon.numero).trim();
     const titleEl = document.getElementById('canonDetailTitle');
     if (titleEl) titleEl.textContent = `Canon ${canon.numero}`;
-
-    const detailLatContainer = document.getElementById('canonDetailLatBtnContainer');
-    if (detailLatContainer) {
-      detailLatContainer.innerHTML = createLatinButton(canon.numero).outerHTML;
-    }
 
     // Meta chips: libro, capítulo, temas
     const metaContainer = document.getElementById('canonDetailMeta');
@@ -385,7 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let metaHtml = '';
       if (canon.libro) metaHtml += metaChip('book', canon.libro);
       if (canon.capitulo && canon.capitulo !== canon.titulo) metaHtml += metaChip('tag', canon.capitulo);
-      if (canon.temas && canon.temas.length > 0) {
+      if (Array.isArray(canon.temas) && canon.temas.length > 0) {
         canon.temas.forEach(t => {
           metaHtml += metaChip('tag', t);
         });
@@ -393,11 +422,17 @@ document.addEventListener('DOMContentLoaded', () => {
       metaContainer.innerHTML = metaHtml;
     }
 
-    // Body text
+    // Multilingual tabs directly above the canon body text (Español active by default)
+    const detailLangTabs = document.getElementById('canonDetailLangTabs');
+    if (detailLangTabs) {
+      detailLangTabs.innerHTML = buildLangTabsButtonsHtml(canon);
+      bindLangTabs(detailLangTabs);
+    }
+
+    // Initial body text always in Spanish (canon.texto)
     const bodyEl = document.getElementById('canonDetailBody');
     if (bodyEl) {
-      bodyEl.textContent = canon.texto;
-      delete bodyEl.dataset.textoEspanol;
+      bodyEl.textContent = canon.texto || '';
     }
 
     // Interpretación Auténtica y Copiar Cita
@@ -508,27 +543,46 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function searchCanones(query) {
-    const q = normalizeStr(query);
+    if (!dbData || !Array.isArray(dbData.canones)) return [];
+    const rawTrimmed = String(query || '').trim();
+    if (!rawTrimmed) return [];
 
-    return dbData.canones.filter(canon => {
-      // Match against canon number
-      if (String(canon.numero) === q || `canon ${canon.numero}` === q || `canon${canon.numero}` === q) {
+    const q = normalizeStr(rawTrimmed);
+    const numMatch = q.match(/^(?:canon\s+|can\.?\s*|c\.?\s*)?(\d+)$/);
+    const exactNum = numMatch ? Number(numMatch[1]) : null;
+
+    const filtered = dbData.canones.filter(canon => {
+      if (!canon) return false;
+
+      // 1. Exact match on canon.numero
+      if (exactNum !== null && Number(canon.numero) === exactNum) {
         return true;
       }
 
-      // Match against text
-      if (normalizeStr(canon.texto).includes(q)) return true;
+      // If the user explicitly typed "canon 1331" / "can. 1331", only match exact canon.numero
+      if (exactNum !== null && !/^\d+$/.test(rawTrimmed)) {
+        return false;
+      }
 
-      // Match against temas
-      if (canon.temas.some(t => normalizeStr(t).includes(q))) return true;
+      // If the user typed a pure canon number (e.g. "1331"), avoid matching "§ 1" noise in text
+      if (exactNum !== null && canonMap.has(exactNum)) {
+        return false;
+      }
 
-      // Match against libro / capítulo / título
-      if (normalizeStr(canon.libro).includes(q)) return true;
-      if (normalizeStr(canon.capitulo).includes(q)) return true;
-      if (normalizeStr(canon.titulo).includes(q)) return true;
+      // 2. Match against canon.texto (Spanish content)
+      if (typeof canon.texto === 'string' && normalizeStr(canon.texto).includes(q)) {
+        return true;
+      }
+
+      // 3. Match against canon.temas array
+      if (Array.isArray(canon.temas) && canon.temas.some(t => normalizeStr(t).includes(q))) {
+        return true;
+      }
 
       return false;
     });
+
+    return filtered;
   }
 
   function renderSearchResults(results, query) {
@@ -552,8 +606,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const itemsHtml = results.map(canon => {
-      const highlightedText = highlightMatch(canon.texto, query);
-      const tagsHtml = canon.temas.map(t =>
+      const defaultText = canon.texto || '';
+      const highlightedText = highlightMatch(defaultText, query);
+      const temasList = Array.isArray(canon.temas) ? canon.temas : [];
+      const tagsHtml = temasList.map(t =>
         `<span class="search-result-tag">${highlightMatch(t, query)}</span>`
       ).join('');
 
@@ -561,17 +617,15 @@ document.addEventListener('DOMContentLoaded', () => {
         ? `<a href="interpretaciones.html?canon=${canon.numero}" class="enlace-interpretacion" onclick="event.stopPropagation();" style="display: inline-block; margin-top: 8px; padding: 4px 8px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.82em; text-decoration: none; border: 1px solid #cbd5e1;">◂ Ver Interpretación Auténtica</a>`
         : '';
 
-      const latinBtnHtml = createLatinButton(canon.numero).outerHTML;
-
       return `
         <div class="search-result-item canon-card" data-canon="${canon.numero}" role="button" tabindex="0">
           <div class="search-result-number canon-numero">${canon.numero}</div>
           <div class="search-result-content">
-            <div class="search-result-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-              <div class="search-result-title" style="margin-bottom: 0;">Canon ${canon.numero}</div>
-              ${latinBtnHtml}
+            <div class="canon-title-row">
+              <h3 class="search-result-title">Canon ${canon.numero}</h3>
+              ${buildLangTabsContainerHtml(canon)}
             </div>
-            <div class="search-result-excerpt canon-texto">${highlightedText}</div>
+            <div class="search-result-excerpt canon-texto" data-query="${escapeHtml(query)}">${highlightedText}</div>
             <button type="button" class="btn-copiar-cita" onclick="copiarCitaCanon(this)" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.85em; border: 1px solid #cbd5e1; cursor: pointer;">📋 Copiar Cita</button>
             ${interpLinkHtml}
             <div class="search-result-tags">${tagsHtml}</div>
@@ -582,17 +636,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchResults.innerHTML = `<div class="search-results-inner">${itemsHtml}</div>`;
     searchResults.classList.add('has-results');
-    injectLatinButtons();
+    bindLangTabs(searchResults);
 
     // Bind click handlers for search result items
     searchResults.querySelectorAll('.search-result-item').forEach(item => {
-      item.addEventListener('click', () => {
+      item.addEventListener('click', (e) => {
+        if (e.target.closest('.lang-tabs-container') || e.target.closest('.btn-copiar-cita') || e.target.closest('.enlace-interpretacion')) return;
         const num = parseInt(item.dataset.canon, 10);
         showCanonDetail(num);
         clearSearchResults();
         if (searchInput) searchInput.value = '';
       });
       item.addEventListener('keydown', (e) => {
+        if (e.target.closest('.lang-tabs-container')) return;
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           const num = parseInt(item.dataset.canon, 10);
@@ -773,6 +829,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function findCanon(numero) {
     if (!dbData || !dbData.canones) return null;
     const n = typeof numero === 'number' ? numero : parseInt(numero, 10);
+    if (canonMap.size > 0) {
+      return canonMap.get(n) || null;
+    }
     return dbData.canones.find(c => c.numero === n) || null;
   }
 
@@ -1136,7 +1195,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // =====================================================================
 
   loadData();
-  loadLatinData();
   initPeSearch();
   initColeccionTematica();
 
@@ -1213,48 +1271,3 @@ function fallbackCopyText(text, onSuccess) {
   }
   document.body.removeChild(textarea);
 }
-
-// =====================================================================
-// FUNCIÓN INDEPENDIENTE: TOGGLE TEXTO LATÍN (Interruptor Latín / Español)
-// =====================================================================
-
-window.toggleTextoLatin = function(boton, canonNum) {
-  try {
-    if (window.event) window.event.stopPropagation();
-
-    const card = boton.closest('.search-result-item, .canon-card, .accordion-canon-item, #canonDetail, .content-wrapper');
-    const canonStr = String(canonNum || (card ? (card.dataset.canon || card.getAttribute('data-canon')) : '')).trim();
-    const map = (typeof latinDataMap !== 'undefined' && latinDataMap) ? latinDataMap : window.latinDataMap;
-
-    // 1. Lazy Check
-    if (!map || !map.has(canonStr)) {
-      const textoOriginal = boton.innerHTML;
-      boton.innerHTML = '⏳ Cargando...';
-      setTimeout(() => { boton.innerHTML = textoOriginal; }, 1500);
-      return;
-    }
-
-    // 2. Búsqueda de contenedor
-    if (!card) return;
-
-    const textContainer = card.querySelector('.search-result-excerpt, .canon-texto, .canon-preview-text, #canonDetailText, #canonDetailBody, p');
-    if (!textContainer) return;
-
-    // 3. Lógica de intercambio (Toggle)
-    if (boton.innerHTML.includes('LAT')) {
-      if (!textContainer.dataset.textoEspanol) {
-        textContainer.dataset.textoEspanol = textContainer.innerHTML;
-      }
-      const rawLatin = map.get(canonStr);
-      textContainer.innerHTML = rawLatin.includes('<') ? rawLatin : rawLatin.replace(/\n/g, '<br>');
-      boton.innerHTML = '🇪🇸 ESP';
-    } else {
-      if (textContainer.dataset.textoEspanol) {
-        textContainer.innerHTML = textContainer.dataset.textoEspanol;
-      }
-      boton.innerHTML = '🇻🇦 LAT';
-    }
-  } catch (err) {
-    console.error('Error al alternar texto en latín:', err);
-  }
-};
