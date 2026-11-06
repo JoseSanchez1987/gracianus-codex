@@ -1,4 +1,9 @@
-const CACHE_NAME = 'gracianus-v2';
+const CACHE_NAME = 'gracianus-v4';
+
+// Absolute URLs derived from the SW location (/gracianus-codex/sw.js).
+// They match the manifest's start_url / scope byte-for-byte.
+const SCOPE_URL = new URL('./', self.location).href;            // https://<user>.github.io/gracianus-codex/
+const START_URL = new URL('./index.html', self.location).href;  // https://<user>.github.io/gracianus-codex/index.html
 
 const urlsToCache = [
   './',
@@ -90,7 +95,44 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Strategy 2: Static assets (HTML, CSS, JS, Images, Fonts) -> Cache First with Network Fallback
+  // Strategy 0: Manifest & install icons -> Network First (never stale).
+  // Chrome hashes the icon it downloads and the WebAPK server re-downloads it;
+  // a stale cached copy produces a hash mismatch and aborts WebAPK minting.
+  if (url.pathname.endsWith('.webmanifest') || /\/assets\/icon-\d+\.png$/.test(url.pathname)) {
+    event.respondWith(
+      fetch(request)
+        .then(networkResponse => {
+          if (networkResponse && networkResponse.status === 200) {
+            const copy = networkResponse.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(request, { ignoreSearch: true })
+          .then(cached => cached || Response.error()))
+    );
+    return;
+  }
+
+  // Strategy 1b: Navigations (incl. start_url) -> Cache First, always resolves to a valid 200 Response
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      caches.match(request, { ignoreSearch: true })
+        .then(cached => cached || fetch(request).then(networkResponse => {
+          if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic' && !networkResponse.redirected) {
+            const copy = networkResponse.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+          }
+          return networkResponse;
+        }))
+        .catch(() => caches.match(START_URL)
+          .then(r => r || caches.match(SCOPE_URL)))
+        .then(response => response ? cleanRedirect(response) : Response.error())
+    );
+    return;
+  }
+
+  // Strategy 2: Static assets (CSS, JS, Images, Fonts) -> Cache First with Network Fallback
   event.respondWith(
     caches.match(request, { ignoreSearch: true }).then(cachedResponse => {
       if (cachedResponse) {
@@ -110,12 +152,18 @@ self.addEventListener('fetch', event => {
 
           return networkResponse;
         })
-        .catch(() => {
-          // If offline and requesting an HTML page, fallback to index.html
-          if (request.headers.get('accept') && request.headers.get('accept').includes('text/html')) {
-            return caches.match('./index.html') || caches.match('./');
-          }
-        });
+        .catch(() => Response.error());
     })
   );
 });
+
+// A response obtained through a redirect cannot be served to a navigation
+// request (redirect mode "manual"); rebuild it as a clean, non-redirected Response.
+function cleanRedirect(response) {
+  if (!response.redirected) return response;
+  return response.blob().then(body => new Response(body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers
+  }));
+}
