@@ -103,42 +103,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  async function loadData() {
-    let loaded = null;
-
-    // 1. Primary: fetch ./data_multilingue_final.json over HTTP/HTTPS
-    if (window.location.protocol !== 'file:') {
-      try {
-        const res = await fetch('./data_multilingue_final.json');
-        if (res.ok) {
-          loaded = await res.json();
-        }
-      } catch (err) {
-        // Fallback below if fetch is blocked or unavailable
-      }
-    }
-
-    // 2. Local file:// fallback so opening index.html directly from disk also works
-    if (!loaded) {
-      loaded = await loadScriptFallback('./data_multilingue_final.js');
-    }
-
-    if (!loaded) {
-      console.error('No se pudo cargar data_multilingue_final.json.');
-      if (accordionContainer) {
-        accordionContainer.innerHTML = '<div class="accordion-empty">Error al cargar la base de datos de cánones.</div>';
-      }
-      return;
-    }
-
+  function finishDataInit(loaded, alreadyNormalized = false) {
     // Support both { estructura, canones } and direct array structures
     dbData = Array.isArray(loaded) ? { estructura: [], canones: loaded } : loaded;
-    if (!Array.isArray(dbData.canones)) {
+    if (!dbData || !Array.isArray(dbData.canones)) {
       console.error('Formato inválido en data_multilingue_final.json: falta el array canones.');
       return;
     }
 
-    if (Array.isArray(dbData.estructura) && dbData.estructura.length > 0) {
+    if (!alreadyNormalized && Array.isArray(dbData.estructura) && dbData.estructura.length > 0) {
       normalizeEstructura(dbData);
     }
 
@@ -154,6 +127,66 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchInput && searchInput.value.trim()) {
       performSearch();
     }
+  }
+
+  async function loadDataFallback() {
+    let loaded = null;
+
+    if (window.location.protocol !== 'file:') {
+      try {
+        const res = await fetch('./data_multilingue_final.json');
+        if (res.ok) {
+          loaded = await res.json();
+        }
+      } catch (err) {
+        // Fallback below if fetch is blocked or unavailable
+      }
+    }
+
+    if (!loaded) {
+      loaded = await loadScriptFallback('./data_multilingue_final.js');
+    }
+
+    if (!loaded) {
+      console.error('No se pudo cargar data_multilingue_final.json.');
+      if (accordionContainer) {
+        accordionContainer.innerHTML = '<div class="accordion-empty">Error al cargar la base de datos de cánones.</div>';
+      }
+      return;
+    }
+
+    finishDataInit(loaded, false);
+  }
+
+  async function loadData() {
+    if (accordionContainer) {
+      accordionContainer.innerHTML = '<div class="accordion-empty">Cargando base de datos de cánones…</div>';
+    }
+
+    // Offload fetch, JSON.parse, normalizeEstructura & search indexing to a Web Worker
+    if (window.location.protocol !== 'file:' && typeof Worker !== 'undefined') {
+      try {
+        const worker = new Worker('./data.worker.js');
+        worker.onmessage = (e) => {
+          worker.terminate();
+          if (e.data && e.data.ok && e.data.db) {
+            finishDataInit(e.data.db, true);
+          } else {
+            loadDataFallback();
+          }
+        };
+        worker.onerror = () => {
+          worker.terminate();
+          loadDataFallback();
+        };
+        worker.postMessage({ jsonUrl: './data_multilingue_final.json' });
+        return;
+      } catch (err) {
+        // Fall through to synchronous/main-thread fallback
+      }
+    }
+
+    await loadDataFallback();
   }
 
   // =====================================================================
@@ -228,55 +261,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderAccordion() {
     if (!dbData || !accordionContainer) return;
 
+    // Lazy rendering: only mount the 7 book headers initially (0 canon DOM nodes until opened)
     const html = dbData.estructura.map((libro, i) => {
       const hasTitulos = libro.titulos && libro.titulos.length > 0;
       const totalCanones = hasTitulos
         ? libro.titulos.reduce((sum, t) => sum + (t.canones ? t.canones.length : 0), 0)
         : 0;
-
-      let innerHtml = '';
-
-      if (hasTitulos) {
-        innerHtml = libro.titulos.map(titulo => {
-          const canonItems = (titulo.canones || []).map(num => {
-            const canon = findCanon(num);
-            if (!canon) return '';
-            return `
-              <div class="accordion-canon-item" data-canon="${canon.numero}" role="button" tabindex="0" aria-label="Ver Canon ${canon.numero}">
-                <div class="canon-num-badge">${canon.numero}</div>
-                <div class="canon-preview">
-                  <div class="canon-title-row">
-                    <h3 class="canon-preview-title">Canon ${canon.numero}</h3>
-                    ${buildLangTabsContainerHtml(canon)}
-                  </div>
-                  <div class="canon-preview-text canon-texto">${escapeHtml(canon.texto || '')}</div>
-                </div>
-                <svg class="canon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </div>
-            `;
-          }).join('');
-
-          return `
-            <div class="accordion-titulo">
-              <button class="accordion-titulo-btn" aria-expanded="false">
-                <svg class="titulo-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="9 18 15 12 9 6"/>
-                </svg>
-                <span>${escapeHtml(titulo.nombre)}</span>
-              </button>
-              <div class="accordion-titulo-content">
-                ${canonItems}
-              </div>
-            </div>
-          `;
-        }).join('');
-      } else {
-        innerHtml = `<div class="accordion-empty">Contenido aún no disponible para este libro.</div>`;
-      }
-
       const badgeText = totalCanones > 0 ? `${totalCanones} cánon${totalCanones > 1 ? 'es' : ''}` : 'Vacío';
 
       return `
@@ -288,20 +278,100 @@ document.addEventListener('DOMContentLoaded', () => {
               <polyline points="6 9 12 15 18 9"/>
             </svg>
           </button>
-          <div class="accordion-libro-content">
-            ${innerHtml}
-          </div>
+          <div class="accordion-libro-content" data-rendered="0"></div>
         </div>
       `;
     }).join('');
 
     accordionContainer.innerHTML = html;
     bindAccordionEvents();
-    bindLangTabs(accordionContainer);
+  }
+
+  function renderLibroContent(libroEl, libroIndex) {
+    const contentEl = libroEl.querySelector('.accordion-libro-content');
+    if (!contentEl || contentEl.dataset.rendered === '1') return;
+
+    const libro = dbData && dbData.estructura ? dbData.estructura[libroIndex] : null;
+    if (!libro || !libro.titulos || libro.titulos.length === 0) {
+      contentEl.innerHTML = '<div class="accordion-empty">Contenido aún no disponible para este libro.</div>';
+      contentEl.dataset.rendered = '1';
+      return;
+    }
+
+    contentEl.innerHTML = libro.titulos.map(titulo => {
+      const canonItems = (titulo.canones || []).map(num => {
+        const canon = findCanon(num);
+        if (!canon) return '';
+        return `
+          <div class="accordion-canon-item" data-canon="${canon.numero}" role="button" tabindex="0" aria-label="Ver Canon ${canon.numero}">
+            <div class="canon-num-badge">${canon.numero}</div>
+            <div class="canon-preview">
+              <div class="canon-title-row">
+                <h3 class="canon-preview-title">Canon ${canon.numero}</h3>
+                ${buildLangTabsContainerHtml(canon)}
+              </div>
+              <div class="canon-preview-text canon-texto">${escapeHtml(canon.texto || '')}</div>
+            </div>
+            <svg class="canon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="accordion-titulo">
+          <button class="accordion-titulo-btn" aria-expanded="false">
+            <svg class="titulo-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+            <span>${escapeHtml(titulo.nombre)}</span>
+          </button>
+          <div class="accordion-titulo-content">
+            ${canonItems}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    contentEl.dataset.rendered = '1';
+    bindLibroInnerEvents(contentEl);
+  }
+
+  function bindLibroInnerEvents(contentEl) {
+    // Título toggles
+    contentEl.querySelectorAll('.accordion-titulo-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const titulo = btn.closest('.accordion-titulo');
+        const isOpen = titulo.classList.contains('open');
+        titulo.classList.toggle('open', !isOpen);
+        btn.setAttribute('aria-expanded', String(!isOpen));
+      });
+    });
+
+    // Canon item clicks
+    contentEl.querySelectorAll('.accordion-canon-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        if (e.target.closest('.lang-tabs-container')) return;
+        const num = parseInt(item.dataset.canon, 10);
+        showCanonDetail(num);
+      });
+      item.addEventListener('keydown', (e) => {
+        if (e.target.closest('.lang-tabs-container')) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const num = parseInt(item.dataset.canon, 10);
+          showCanonDetail(num);
+        }
+      });
+    });
+
+    bindLangTabs(contentEl);
   }
 
   function bindAccordionEvents() {
-    // Libro toggles
+    // Libro toggles (lazy-render book content on first open)
     accordionContainer.querySelectorAll('.accordion-libro-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const libro = btn.closest('.accordion-libro');
@@ -315,35 +385,12 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
 
+        if (!isOpen) {
+          renderLibroContent(libro, parseInt(libro.dataset.libroIndex, 10));
+        }
+
         libro.classList.toggle('open', !isOpen);
         btn.setAttribute('aria-expanded', String(!isOpen));
-      });
-    });
-
-    // Título toggles
-    accordionContainer.querySelectorAll('.accordion-titulo-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const titulo = btn.closest('.accordion-titulo');
-        const isOpen = titulo.classList.contains('open');
-        titulo.classList.toggle('open', !isOpen);
-        btn.setAttribute('aria-expanded', String(!isOpen));
-      });
-    });
-
-    // Canon item clicks
-    accordionContainer.querySelectorAll('.accordion-canon-item').forEach(item => {
-      item.addEventListener('click', (e) => {
-        if (e.target.closest('.lang-tabs-container')) return;
-        const num = parseInt(item.dataset.canon, 10);
-        showCanonDetail(num);
-      });
-      item.addEventListener('keydown', (e) => {
-        if (e.target.closest('.lang-tabs-container')) return;
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          const num = parseInt(item.dataset.canon, 10);
-          showCanonDetail(num);
-        }
       });
     });
   }
@@ -569,13 +616,19 @@ document.addEventListener('DOMContentLoaded', () => {
         return false;
       }
 
-      // 2. Match against canon.texto (Spanish content)
-      if (typeof canon.texto === 'string' && normalizeStr(canon.texto).includes(q)) {
+      // 2. Match against canon.texto (use pre-normalized index from Worker when available)
+      const qTexto = canon._qTexto !== undefined
+        ? canon._qTexto
+        : (typeof canon.texto === 'string' ? normalizeStr(canon.texto) : '');
+      if (qTexto && qTexto.includes(q)) {
         return true;
       }
 
       // 3. Match against canon.temas array
-      if (Array.isArray(canon.temas) && canon.temas.some(t => normalizeStr(t).includes(q))) {
+      const qTemas = Array.isArray(canon._qTemas)
+        ? canon._qTemas
+        : (Array.isArray(canon.temas) ? canon.temas.map(normalizeStr) : []);
+      if (qTemas.some(t => t.includes(q))) {
         return true;
       }
 
