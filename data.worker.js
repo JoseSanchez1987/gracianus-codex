@@ -1,6 +1,8 @@
 /* ===================================================================
-   GRACIANUS — Web Worker for non-blocking JSON fetch, parse & indexing
+   GRACIANUS — Web Worker for recursive hierarchical tree & indexing
    =================================================================== */
+
+const CHILD_LEVEL_KEYS = ['partes', 'secciones', 'titulos', 'capitulos', 'articulos'];
 
 function normalizeStr(str) {
   if (!str) return '';
@@ -9,54 +11,53 @@ function normalizeStr(str) {
     .replace(/[\u0300-\u036f]/g, '');
 }
 
-function normalizeEstructura(db) {
-  if (!db || !db.estructura || !db.canones) return;
-  const map = new Map();
-  db.canones.forEach(c => map.set(c.numero, c));
+function getNodeLabel(node) {
+  return String(
+    node.nombre || node.libro || node.parte || node.seccion ||
+    node.titulo || node.capitulo || node.articulo || 'Sin título'
+  ).trim();
+}
 
-  db.estructura.forEach(libro => {
-    const hasEmptyTitle = (libro.titulos || []).some(t => !t.nombre || t.nombre.trim() === '');
-    if (!hasEmptyTitle) return;
+function normalizeTreeNode(node, pathPrefix, index) {
+  if (!node || typeof node !== 'object') return null;
 
-    const newTitulos = [];
-    const seenTitles = new Map();
+  const nodeId = `${pathPrefix}-${index}`;
+  const directCanones = Array.isArray(node.canones) ? node.canones : [];
+  const children = [];
 
-    (libro.titulos || []).forEach(t => {
-      if (!t.nombre || t.nombre.trim() === '') {
-        (t.canones || []).forEach(num => {
-          const c = map.get(num);
-          if (!c) return;
-          const titName = (c.titulo || c.capitulo || 'Cánones Generales').trim();
-          const key = titName.toLowerCase().replace(/[–—]/g, '-').replace(/\s+/g, ' ');
-          if (!seenTitles.has(key)) {
-            const groupObj = { nombre: titName, canones: [] };
-            seenTitles.set(key, groupObj);
-            newTitulos.push(groupObj);
-          }
-          seenTitles.get(key).canones.push(num);
-        });
-      } else {
-        const titName = t.nombre.trim();
-        const key = titName.toLowerCase().replace(/[–—]/g, '-').replace(/\s+/g, ' ');
-        if (!seenTitles.has(key)) {
-          const groupObj = { nombre: titName, canones: [] };
-          seenTitles.set(key, groupObj);
-          newTitulos.push(groupObj);
+  CHILD_LEVEL_KEYS.forEach((key) => {
+    if (Array.isArray(node[key]) && node[key].length > 0) {
+      node[key].forEach((child, childIdx) => {
+        const normalizedChild = normalizeTreeNode(child, `${nodeId}-${key}`, childIdx);
+        if (normalizedChild) {
+          normalizedChild._levelType = key;
+          children.push(normalizedChild);
         }
-        (t.canones || []).forEach(num => {
-          if (!seenTitles.get(key).canones.includes(num)) {
-            seenTitles.get(key).canones.push(num);
-          }
-        });
-      }
-    });
-
-    libro.titulos = newTitulos;
+      });
+    }
   });
+
+  const childrenCanonCount = children.reduce((sum, ch) => sum + ch._totalCanones, 0);
+
+  return {
+    ...node,
+    _id: nodeId,
+    _label: getNodeLabel(node),
+    _children: children,
+    canones: directCanones,
+    _totalCanones: directCanones.length + childrenCanonCount
+  };
+}
+
+function normalizeEstructura(db) {
+  if (!db || !Array.isArray(db.estructura)) return [];
+  return db.estructura
+    .map((libro, i) => normalizeTreeNode(libro, 'libro', i))
+    .filter(Boolean);
 }
 
 self.onmessage = async (e) => {
-  const jsonUrl = (e.data && e.data.jsonUrl) || './data_multilingue_final.json';
+  const jsonUrl = (e.data && e.data.jsonUrl) || './data_jerarquica_final.json';
   try {
     const res = await fetch(jsonUrl);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -64,15 +65,13 @@ self.onmessage = async (e) => {
 
     const db = Array.isArray(loaded) ? { estructura: [], canones: loaded } : loaded;
     if (!Array.isArray(db.canones)) {
-      throw new Error('Formato inválido en data_multilingue_final.json: falta el array canones.');
+      throw new Error('Formato inválido en data_jerarquica_final.json: falta el array canones.');
     }
 
-    if (Array.isArray(db.estructura) && db.estructura.length > 0) {
-      normalizeEstructura(db);
-    }
+    db.estructura = normalizeEstructura(db);
 
     // Precompute accent-stripped search fields off the main thread
-    db.canones.forEach(c => {
+    db.canones.forEach((c) => {
       if (!c) return;
       c._qTexto = normalizeStr(c.texto);
       c._qTemas = Array.isArray(c.temas) ? c.temas.map(normalizeStr) : [];

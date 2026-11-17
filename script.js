@@ -20,7 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   // --- DOM References ---
-  const sidebar       = document.getElementById('sidebar');
+  const mainContent    = document.getElementById('mainContent') || document.querySelector('.main-content');
+  const sidebar        = document.getElementById('sidebar');
+  const sidebarBrandBtn = document.getElementById('sidebarBrandBtn');
+  const mobileBrandBtn  = document.getElementById('mobileBrandBtn');
   const overlay        = document.getElementById('sidebarOverlay');
   const hamburgerBtn   = document.getElementById('hamburgerBtn');
   const navLinks       = document.querySelectorAll('.nav-link');
@@ -42,77 +45,77 @@ document.addEventListener('DOMContentLoaded', () => {
    * Load data from the global DB_DATA constant (declared in data.js).
    * This avoids fetch/CORS issues when opening via file:// protocol.
    */
-  function normalizeEstructura(db) {
-    if (!db || !db.estructura || !db.canones) return;
-    const canonMap = new Map();
-    db.canones.forEach(c => canonMap.set(c.numero, c));
+  const CHILD_LEVEL_KEYS = ['partes', 'secciones', 'titulos', 'capitulos', 'articulos'];
 
-    db.estructura.forEach(libro => {
-      const hasEmptyTitle = (libro.titulos || []).some(t => !t.nombre || t.nombre.trim() === '');
-      if (hasEmptyTitle) {
-        const newTitulos = [];
-        const seenTitles = new Map();
+  function getNodeLabel(node) {
+    return String(
+      node.nombre || node.libro || node.parte || node.seccion ||
+      node.titulo || node.capitulo || node.articulo || 'Sin título'
+    ).trim();
+  }
 
-        (libro.titulos || []).forEach(t => {
-          if (!t.nombre || t.nombre.trim() === '') {
-            (t.canones || []).forEach(num => {
-              const c = canonMap.get(num);
-              if (!c) return;
-              const titName = (c.titulo || c.capitulo || 'Cánones Generales').trim();
-              const key = titName.toLowerCase().replace(/[–—]/g, '-').replace(/\s+/g, ' ');
-              if (!seenTitles.has(key)) {
-                const groupObj = { nombre: titName, canones: [] };
-                seenTitles.set(key, groupObj);
-                newTitulos.push(groupObj);
-              }
-              seenTitles.get(key).canones.push(num);
-            });
-          } else {
-            const titName = t.nombre.trim();
-            const key = titName.toLowerCase().replace(/[–—]/g, '-').replace(/\s+/g, ' ');
-            if (!seenTitles.has(key)) {
-              const groupObj = { nombre: titName, canones: [] };
-              seenTitles.set(key, groupObj);
-              newTitulos.push(groupObj);
-            }
-            (t.canones || []).forEach(num => {
-              if (!seenTitles.get(key).canones.includes(num)) {
-                seenTitles.get(key).canones.push(num);
-              }
-            });
+  function normalizeTreeNode(node, pathPrefix, index) {
+    if (!node || typeof node !== 'object') return null;
+
+    const nodeId = `${pathPrefix}-${index}`;
+    const directCanones = Array.isArray(node.canones) ? node.canones : [];
+    const children = [];
+
+    CHILD_LEVEL_KEYS.forEach((key) => {
+      if (Array.isArray(node[key]) && node[key].length > 0) {
+        node[key].forEach((child, childIdx) => {
+          const normalizedChild = normalizeTreeNode(child, `${nodeId}-${key}`, childIdx);
+          if (normalizedChild) {
+            normalizedChild._levelType = key;
+            children.push(normalizedChild);
           }
         });
-
-        libro.titulos = newTitulos;
       }
     });
+
+    const childrenCanonCount = children.reduce((sum, ch) => sum + ch._totalCanones, 0);
+
+    return {
+      ...node,
+      _id: nodeId,
+      _label: getNodeLabel(node),
+      _children: children,
+      canones: directCanones,
+      _totalCanones: directCanones.length + childrenCanonCount
+    };
+  }
+
+  function normalizeEstructura(db) {
+    if (!db || !Array.isArray(db.estructura)) return [];
+    return db.estructura
+      .map((libro, i) => normalizeTreeNode(libro, 'libro', i))
+      .filter(Boolean);
   }
 
 
   function loadScriptFallback(src) {
     return new Promise((resolve) => {
-      if (window.DB_MULTILINGUE_DATA) {
-        resolve(window.DB_MULTILINGUE_DATA);
+      if (window.DB_JERARQUICA_DATA) {
+        resolve(window.DB_JERARQUICA_DATA);
         return;
       }
       const script = document.createElement('script');
       script.src = src;
-      script.onload = () => resolve(window.DB_MULTILINGUE_DATA || null);
+      script.onload = () => resolve(window.DB_JERARQUICA_DATA || null);
       script.onerror = () => resolve(null);
       document.head.appendChild(script);
     });
   }
 
   function finishDataInit(loaded, alreadyNormalized = false) {
-    // Support both { estructura, canones } and direct array structures
     dbData = Array.isArray(loaded) ? { estructura: [], canones: loaded } : loaded;
     if (!dbData || !Array.isArray(dbData.canones)) {
-      console.error('Formato inválido en data_multilingue_final.json: falta el array canones.');
+      console.error('Formato inválido en data_jerarquica_final.json: falta el array canones.');
       return;
     }
 
-    if (!alreadyNormalized && Array.isArray(dbData.estructura) && dbData.estructura.length > 0) {
-      normalizeEstructura(dbData);
+    if (!alreadyNormalized && Array.isArray(dbData.estructura)) {
+      dbData.estructura = normalizeEstructura(dbData);
     }
 
     canonMap.clear();
@@ -122,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    renderAccordion();
+    renderCodexSplitView();
 
     if (searchInput && searchInput.value.trim()) {
       performSearch();
@@ -134,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (window.location.protocol !== 'file:') {
       try {
-        const res = await fetch('./data_multilingue_final.json');
+        const res = await fetch('./data_jerarquica_final.json');
         if (res.ok) {
           loaded = await res.json();
         }
@@ -144,11 +147,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (!loaded) {
-      loaded = await loadScriptFallback('./data_multilingue_final.js');
+      loaded = await loadScriptFallback('./data_jerarquica_final.js');
     }
 
     if (!loaded) {
-      console.error('No se pudo cargar data_multilingue_final.json.');
+      console.error('No se pudo cargar data_jerarquica_final.json.');
       if (accordionContainer) {
         accordionContainer.innerHTML = '<div class="accordion-empty">Error al cargar la base de datos de cánones.</div>';
       }
@@ -163,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
       accordionContainer.innerHTML = '<div class="accordion-empty">Cargando base de datos de cánones…</div>';
     }
 
-    // Offload fetch, JSON.parse, normalizeEstructura & search indexing to a Web Worker
+    // Offload fetch, JSON.parse, recursive tree normalization & search indexing to a Web Worker
     if (window.location.protocol !== 'file:' && typeof Worker !== 'undefined') {
       try {
         const worker = new Worker('./data.worker.js');
@@ -179,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
           worker.terminate();
           loadDataFallback();
         };
-        worker.postMessage({ jsonUrl: './data_multilingue_final.json' });
+        worker.postMessage({ jsonUrl: './data_jerarquica_final.json' });
         return;
       } catch (err) {
         // Fall through to synchronous/main-thread fallback
@@ -255,106 +258,57 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =====================================================================
-  // ACCORDION RENDERING
+  // SPLIT VIEW: BARRA LATERAL JERÁRQUICA + PANEL CENTRAL DE CÁNONES
   // =====================================================================
 
-  function renderAccordion() {
-    if (!dbData || !accordionContainer) return;
+  const treeNodeMap = new Map();
+  let activeTreeNode = null;
 
-    // Lazy rendering: only mount the 7 book headers initially (0 canon DOM nodes until opened)
-    const html = dbData.estructura.map((libro, i) => {
-      const hasTitulos = libro.titulos && libro.titulos.length > 0;
-      const totalCanones = hasTitulos
-        ? libro.titulos.reduce((sum, t) => sum + (t.canones ? t.canones.length : 0), 0)
-        : 0;
-      const badgeText = totalCanones > 0 ? `${totalCanones} cánon${totalCanones > 1 ? 'es' : ''}` : 'Vacío';
+  /**
+   * Reutiliza exactamente el diseño de tarjeta de búsqueda estabilizado
+   * tanto para la lectura por árbol como para los resultados de búsqueda.
+   */
+  function buildCanonCardHtml(canon, query = '') {
+    if (!canon) return '';
+    const defaultText = canon.texto || '';
+    const bodyHtml = query ? highlightMatch(defaultText, query) : escapeHtml(defaultText);
+    const queryAttr = query ? ` data-query="${escapeHtml(query)}"` : '';
 
-      return `
-        <div class="accordion-libro" data-libro-index="${i}">
-          <button class="accordion-libro-btn" aria-expanded="false">
-            <span class="libro-label">${escapeHtml(libro.libro)}</span>
-            <span class="libro-badge">${badgeText}</span>
-            <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"/>
-            </svg>
-          </button>
-          <div class="accordion-libro-content" data-rendered="0"></div>
+    const temasList = Array.isArray(canon.temas) ? canon.temas : [];
+    const tagsHtml = temasList.map(t =>
+      `<span class="search-result-tag">${query ? highlightMatch(t, query) : escapeHtml(t)}</span>`
+    ).join('');
+
+    const interpLinkHtml = canon.tiene_interpretacion
+      ? `<a href="interpretaciones.html?canon=${canon.numero}" class="enlace-interpretacion" onclick="event.stopPropagation();" style="display: inline-block; margin-top: 8px; padding: 4px 8px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.82em; text-decoration: none; border: 1px solid #cbd5e1;">◂ Ver Interpretación Auténtica</a>`
+      : '';
+
+    return `
+      <div class="search-result-item canon-card" data-canon="${canon.numero}" role="button" tabindex="0">
+        <div class="search-result-number canon-numero">${canon.numero}</div>
+        <div class="search-result-content">
+          <div class="canon-title-row">
+            <h3 class="search-result-title">Canon ${canon.numero}</h3>
+            ${buildLangTabsContainerHtml(canon)}
+          </div>
+          <div class="search-result-excerpt canon-texto"${queryAttr}>${bodyHtml}</div>
+          <button type="button" class="btn-copiar-cita" onclick="copiarCitaCanon(this)" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.85em; border: 1px solid #cbd5e1; cursor: pointer;">📋 Copiar Cita</button>
+          ${interpLinkHtml}
+          ${tagsHtml ? `<div class="search-result-tags">${tagsHtml}</div>` : ''}
         </div>
-      `;
-    }).join('');
-
-    accordionContainer.innerHTML = html;
-    bindAccordionEvents();
+      </div>
+    `;
   }
 
-  function renderLibroContent(libroEl, libroIndex) {
-    const contentEl = libroEl.querySelector('.accordion-libro-content');
-    if (!contentEl || contentEl.dataset.rendered === '1') return;
+  function bindCanonCardEvents(containerEl, onBeforeOpenDetail = null) {
+    if (!containerEl) return;
+    bindLangTabs(containerEl);
 
-    const libro = dbData && dbData.estructura ? dbData.estructura[libroIndex] : null;
-    if (!libro || !libro.titulos || libro.titulos.length === 0) {
-      contentEl.innerHTML = '<div class="accordion-empty">Contenido aún no disponible para este libro.</div>';
-      contentEl.dataset.rendered = '1';
-      return;
-    }
-
-    contentEl.innerHTML = libro.titulos.map(titulo => {
-      const canonItems = (titulo.canones || []).map(num => {
-        const canon = findCanon(num);
-        if (!canon) return '';
-        return `
-          <div class="accordion-canon-item" data-canon="${canon.numero}" role="button" tabindex="0" aria-label="Ver Canon ${canon.numero}">
-            <div class="canon-num-badge">${canon.numero}</div>
-            <div class="canon-preview">
-              <div class="canon-title-row">
-                <h3 class="canon-preview-title">Canon ${canon.numero}</h3>
-                ${buildLangTabsContainerHtml(canon)}
-              </div>
-              <div class="canon-preview-text canon-texto">${escapeHtml(canon.texto || '')}</div>
-            </div>
-            <svg class="canon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"/>
-              <polyline points="12 5 19 12 12 19"/>
-            </svg>
-          </div>
-        `;
-      }).join('');
-
-      return `
-        <div class="accordion-titulo">
-          <button class="accordion-titulo-btn" aria-expanded="false">
-            <svg class="titulo-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="9 18 15 12 9 6"/>
-            </svg>
-            <span>${escapeHtml(titulo.nombre)}</span>
-          </button>
-          <div class="accordion-titulo-content">
-            ${canonItems}
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    contentEl.dataset.rendered = '1';
-    bindLibroInnerEvents(contentEl);
-  }
-
-  function bindLibroInnerEvents(contentEl) {
-    // Título toggles
-    contentEl.querySelectorAll('.accordion-titulo-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const titulo = btn.closest('.accordion-titulo');
-        const isOpen = titulo.classList.contains('open');
-        titulo.classList.toggle('open', !isOpen);
-        btn.setAttribute('aria-expanded', String(!isOpen));
-      });
-    });
-
-    // Canon item clicks
-    contentEl.querySelectorAll('.accordion-canon-item').forEach(item => {
+    containerEl.querySelectorAll('.search-result-item').forEach(item => {
       item.addEventListener('click', (e) => {
-        if (e.target.closest('.lang-tabs-container')) return;
+        if (e.target.closest('.lang-tabs-container') || e.target.closest('.btn-copiar-cita') || e.target.closest('.enlace-interpretacion')) return;
         const num = parseInt(item.dataset.canon, 10);
+        if (typeof onBeforeOpenDetail === 'function') onBeforeOpenDetail();
         showCanonDetail(num);
       });
       item.addEventListener('keydown', (e) => {
@@ -362,37 +316,260 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           const num = parseInt(item.dataset.canon, 10);
+          if (typeof onBeforeOpenDetail === 'function') onBeforeOpenDetail();
           showCanonDetail(num);
         }
       });
     });
-
-    bindLangTabs(contentEl);
   }
 
-  function bindAccordionEvents() {
-    // Libro toggles (lazy-render book content on first open)
-    accordionContainer.querySelectorAll('.accordion-libro-btn').forEach(btn => {
+  function enterReadingView() {
+    if (mainContent) {
+      mainContent.classList.add('view-reading');
+    }
+  }
+
+  function exitReadingView() {
+    if (mainContent) {
+      mainContent.classList.remove('view-reading');
+    }
+    activeTreeNode = null;
+    if (searchInput) searchInput.value = '';
+    if (searchResults) {
+      searchResults.innerHTML = '';
+      searchResults.classList.remove('has-results');
+    }
+    const sidebarTree = document.getElementById('codexTreeSidebar');
+    if (sidebarTree) {
+      sidebarTree.querySelectorAll('.tree-select-btn.active').forEach(el => el.classList.remove('active'));
+      sidebarTree.classList.remove('is-mobile-open');
+    }
+    const mobileToggle = document.getElementById('mobileTreeToggle');
+    if (mobileToggle) {
+      mobileToggle.setAttribute('aria-expanded', 'false');
+    }
+    hideCanonDetail();
+    renderCentralCanons(null);
+  }
+
+  function buildHomeBooksHtml(libros) {
+    if (!Array.isArray(libros) || libros.length === 0) return '';
+    return libros.map((libro) => {
+      const total = libro._totalCanones || 0;
+      const badgeText = total > 0 ? `${total} cánon${total > 1 ? 'es' : ''}` : 'Vacío';
+      return `
+        <div class="accordion-libro home-book-item">
+          <button type="button" class="accordion-libro-btn home-book-btn" data-node-id="${escapeHtml(libro._id)}">
+            <span class="libro-label">${escapeHtml(libro._label)}</span>
+            <span class="libro-badge">${badgeText}</span>
+            <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderCodexSplitView() {
+    if (!dbData || !accordionContainer) return;
+    treeNodeMap.clear();
+    activeTreeNode = null;
+
+    accordionContainer.innerHTML = `
+      <div class="home-books-accordion" id="homeBooksAccordion">
+        ${buildHomeBooksHtml(dbData.estructura)}
+      </div>
+      <div class="codex-split-layout">
+        <div class="codex-sidebar-wrapper">
+          <button type="button" class="codex-mobile-tree-toggle" id="mobileTreeToggle" aria-expanded="false" aria-controls="codexTreeSidebar">
+            <span>Índice del Código (Libros y Títulos)</span>
+            <span class="mobile-tree-chevron" aria-hidden="true">▾</span>
+          </button>
+          <aside class="codex-tree-sidebar" id="codexTreeSidebar" aria-label="Índice jerárquico del Código">
+            ${buildTreeLevelHtml(dbData.estructura, 0)}
+          </aside>
+        </div>
+        <section class="codex-main-panel" id="codexMainPanel" aria-live="polite">
+          <div class="codex-panel-placeholder">
+            Selecciona un Libro, Título, Capítulo o Artículo en el índice lateral para leer sus cánones.
+          </div>
+        </section>
+      </div>
+    `;
+
+    // Estado 1 -> Estado 2 al pulsar uno de los 7 Libros en Inicio
+    accordionContainer.querySelectorAll('.home-book-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const libro = btn.closest('.accordion-libro');
-        const isOpen = libro.classList.contains('open');
-
-        // Close all other libros
-        accordionContainer.querySelectorAll('.accordion-libro.open').forEach(el => {
-          if (el !== libro) {
-            el.classList.remove('open');
-            el.querySelector('.accordion-libro-btn').setAttribute('aria-expanded', 'false');
-          }
-        });
-
-        if (!isOpen) {
-          renderLibroContent(libro, parseInt(libro.dataset.libroIndex, 10));
+        const targetId = btn.dataset.nodeId;
+        enterReadingView();
+        const treeBtn = document.querySelector(`#codexTreeSidebar .tree-select-btn[data-node-id="${targetId}"]`);
+        if (treeBtn) {
+          treeBtn.click();
+          treeBtn.scrollIntoView({ block: 'nearest' });
         }
-
-        libro.classList.toggle('open', !isOpen);
-        btn.setAttribute('aria-expanded', String(!isOpen));
+        if (accordionSection) {
+          accordionSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       });
     });
+
+    bindTreeSidebarEvents();
+  }
+
+  function buildTreeLevelHtml(nodes, depth) {
+    if (!Array.isArray(nodes) || nodes.length === 0) return '';
+
+    const itemsHtml = nodes.map((node) => {
+      treeNodeMap.set(node._id, node);
+
+      const hasChildren = Array.isArray(node._children) && node._children.length > 0;
+      const hasDirectCanones = Array.isArray(node.canones) && node.canones.length > 0;
+      const badge = node._totalCanones > 0 ? `<span class="tree-node-badge">${node._totalCanones}</span>` : '';
+
+      return `
+        <li class="tree-node" data-node-id="${escapeHtml(node._id)}" data-depth="${depth}">
+          <div class="tree-node-row">
+            ${hasChildren
+              ? `<button type="button" class="tree-toggle-btn" aria-expanded="false" aria-label="Desplegar ${escapeHtml(node._label)}">▸</button>`
+              : `<span class="tree-leaf-dot" aria-hidden="true">•</span>`
+            }
+            <button type="button"
+                    class="tree-select-btn${hasDirectCanones ? ' has-canons' : ''}"
+                    data-node-id="${escapeHtml(node._id)}">
+              <span class="tree-node-label">${escapeHtml(node._label)}</span>
+              ${badge}
+            </button>
+          </div>
+          ${hasChildren ? `<div class="tree-children" hidden>${buildTreeLevelHtml(node._children, depth + 1)}</div>` : ''}
+        </li>
+      `;
+    }).join('');
+
+    return `<ul class="tree-list tree-list--depth-${depth}">${itemsHtml}</ul>`;
+  }
+
+  function bindTreeSidebarEvents() {
+    const sidebarTree = document.getElementById('codexTreeSidebar');
+    const mobileToggle = document.getElementById('mobileTreeToggle');
+    if (!sidebarTree) return;
+
+    if (mobileToggle) {
+      mobileToggle.addEventListener('click', () => {
+        const isOpen = sidebarTree.classList.toggle('is-mobile-open');
+        mobileToggle.setAttribute('aria-expanded', String(isOpen));
+      });
+    }
+
+    sidebarTree.querySelectorAll('.tree-toggle-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const li = btn.closest('.tree-node');
+        const childrenBox = li && li.querySelector(':scope > .tree-children');
+        if (!childrenBox) return;
+
+        const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!isExpanded));
+        btn.textContent = isExpanded ? '▸' : '▾';
+        childrenBox.hidden = isExpanded;
+      });
+    });
+
+    sidebarTree.querySelectorAll('.tree-select-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const node = treeNodeMap.get(btn.dataset.nodeId);
+        if (!node) return;
+
+        const li = btn.closest('.tree-node');
+        const toggleBtn = li && li.querySelector(':scope > .tree-node-row > .tree-toggle-btn');
+        const childrenBox = li && li.querySelector(':scope > .tree-children');
+        if (toggleBtn && childrenBox && childrenBox.hidden) {
+          toggleBtn.setAttribute('aria-expanded', 'true');
+          toggleBtn.textContent = '▾';
+          childrenBox.hidden = false;
+        }
+
+        sidebarTree.querySelectorAll('.tree-select-btn.active').forEach((el) => el.classList.remove('active'));
+        btn.classList.add('active');
+        activeTreeNode = node;
+
+        // If user had an active search, clear input & exit search mode to show the selected tree node
+        if (searchInput && searchInput.value.trim()) {
+          searchInput.value = '';
+        }
+        if (searchResults) {
+          searchResults.innerHTML = '';
+          searchResults.classList.remove('has-results');
+        }
+
+        // On mobile, collapse tree menu when selecting a node with direct canons so reading uses 100% width
+        if (window.innerWidth <= 768 && Array.isArray(node.canones) && node.canones.length > 0 && mobileToggle) {
+          sidebarTree.classList.remove('is-mobile-open');
+          mobileToggle.setAttribute('aria-expanded', 'false');
+        }
+
+        renderCentralCanons(node);
+      });
+    });
+  }
+
+  function renderCentralCanons(node) {
+    const mainPanel = document.getElementById('codexMainPanel');
+    if (!mainPanel) return;
+
+    if (!node) {
+      mainPanel.innerHTML = `
+        <div class="codex-panel-placeholder">
+          Selecciona un Libro, Título, Capítulo o Artículo en el índice lateral para leer sus cánones.
+        </div>
+      `;
+      return;
+    }
+
+    const canonesNums = Array.isArray(node.canones) ? node.canones : [];
+    const hasChildren = Array.isArray(node._children) && node._children.length > 0;
+
+    if (canonesNums.length === 0) {
+      const subLinksHtml = hasChildren
+        ? `<div class="central-subnodes">${node._children.map(ch => `
+            <button type="button" class="central-subnode-btn" data-target-node="${escapeHtml(ch._id)}">
+              <span>${escapeHtml(ch._label)}</span>
+              ${ch._totalCanones > 0 ? `<span class="libro-badge">${ch._totalCanones}</span>` : ''}
+            </button>
+          `).join('')}</div>`
+        : `<div class="codex-panel-placeholder">No hay cánones directos en esta sección.</div>`;
+
+      mainPanel.innerHTML = `
+        <div class="central-node-header">
+          <h3 class="central-node-title">${escapeHtml(node._label)}</h3>
+          ${node._totalCanones > 0 ? `<span class="libro-badge">${node._totalCanones} cánon${node._totalCanones > 1 ? 'es' : ''}</span>` : ''}
+        </div>
+        ${subLinksHtml}
+      `;
+
+      mainPanel.querySelectorAll('.central-subnode-btn').forEach((subBtn) => {
+        subBtn.addEventListener('click', () => {
+          const targetBtn = document.querySelector(`#codexTreeSidebar .tree-select-btn[data-node-id="${subBtn.dataset.targetNode}"]`);
+          if (targetBtn) targetBtn.click();
+        });
+      });
+      return;
+    }
+
+    const cardsHtml = canonesNums.map((num) => {
+      const canon = findCanon(num);
+      return buildCanonCardHtml(canon, '');
+    }).join('');
+
+    mainPanel.innerHTML = `
+      <div class="central-node-header">
+        <h3 class="central-node-title">${escapeHtml(node._label)}</h3>
+        <span class="libro-badge">${canonesNums.length} cánon${canonesNums.length > 1 ? 'es' : ''}</span>
+      </div>
+      <div class="central-canons-list">${cardsHtml}</div>
+    `;
+
+    bindCanonCardEvents(mainPanel);
   }
 
   // =====================================================================
@@ -639,84 +816,100 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderSearchResults(results, query) {
-    if (!searchResults) return;
+    enterReadingView();
+
+    const mainPanel = document.getElementById('codexMainPanel');
+    const targetEl = mainPanel || searchResults;
+    if (!targetEl) return;
+
+    // Ensure canon detail is hidden so search results in the right panel are visible
+    if (canonDetail && canonDetail.style.display !== 'none') {
+      hideCanonDetail();
+    }
+
+    // Keep dropdown empty when displaying results in the main right-hand panel
+    if (mainPanel && searchResults) {
+      searchResults.innerHTML = '';
+      searchResults.classList.remove('has-results');
+    }
+
     if (results.length === 0) {
-      searchResults.innerHTML = `
-        <div class="search-results-inner">
-          <div class="search-no-results">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32">
-              <circle cx="11" cy="11" r="8"/>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              <line x1="8" y1="8" x2="14" y2="14"/>
-              <line x1="14" y1="8" x2="8" y2="14"/>
-            </svg>
-            No se encontraron resultados para «<strong>${escapeHtml(query)}</strong>»
-          </div>
+      const emptyHtml = `
+        <div class="central-node-header">
+          <h3 class="central-node-title">Resultados para «${escapeHtml(query)}»</h3>
+          <button type="button" class="btn-clear-search" id="btnClearPanelSearch">✕ Limpiar búsqueda</button>
+        </div>
+        <div class="search-no-results">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            <line x1="8" y1="8" x2="14" y2="14"/>
+            <line x1="14" y1="8" x2="8" y2="14"/>
+          </svg>
+          No se encontraron resultados para «<strong>${escapeHtml(query)}</strong>»
         </div>
       `;
-      searchResults.classList.add('has-results');
+      if (mainPanel) {
+        mainPanel.innerHTML = emptyHtml;
+        const clearBtn = document.getElementById('btnClearPanelSearch');
+        if (clearBtn) {
+          clearBtn.addEventListener('click', () => {
+            if (searchInput) searchInput.value = '';
+            clearSearchResults();
+          });
+        }
+      } else {
+        searchResults.innerHTML = `<div class="search-results-inner">${emptyHtml}</div>`;
+        searchResults.classList.add('has-results');
+      }
       return;
     }
 
-    const itemsHtml = results.map(canon => {
-      const defaultText = canon.texto || '';
-      const highlightedText = highlightMatch(defaultText, query);
-      const temasList = Array.isArray(canon.temas) ? canon.temas : [];
-      const tagsHtml = temasList.map(t =>
-        `<span class="search-result-tag">${highlightMatch(t, query)}</span>`
-      ).join('');
+    const itemsHtml = results.map(canon => buildCanonCardHtml(canon, query)).join('');
 
-      const interpLinkHtml = canon.tiene_interpretacion
-        ? `<a href="interpretaciones.html?canon=${canon.numero}" class="enlace-interpretacion" onclick="event.stopPropagation();" style="display: inline-block; margin-top: 8px; padding: 4px 8px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.82em; text-decoration: none; border: 1px solid #cbd5e1;">◂ Ver Interpretación Auténtica</a>`
-        : '';
-
-      return `
-        <div class="search-result-item canon-card" data-canon="${canon.numero}" role="button" tabindex="0">
-          <div class="search-result-number canon-numero">${canon.numero}</div>
-          <div class="search-result-content">
-            <div class="canon-title-row">
-              <h3 class="search-result-title">Canon ${canon.numero}</h3>
-              ${buildLangTabsContainerHtml(canon)}
-            </div>
-            <div class="search-result-excerpt canon-texto" data-query="${escapeHtml(query)}">${highlightedText}</div>
-            <button type="button" class="btn-copiar-cita" onclick="copiarCitaCanon(this)" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.85em; border: 1px solid #cbd5e1; cursor: pointer;">📋 Copiar Cita</button>
-            ${interpLinkHtml}
-            <div class="search-result-tags">${tagsHtml}</div>
+    if (mainPanel) {
+      mainPanel.innerHTML = `
+        <div class="central-node-header">
+          <h3 class="central-node-title">Resultados para «${escapeHtml(query)}»</h3>
+          <div class="central-header-actions">
+            <span class="libro-badge">${results.length} cánon${results.length > 1 ? 'es' : ''}</span>
+            <button type="button" class="btn-clear-search" id="btnClearPanelSearch">✕ Limpiar</button>
           </div>
         </div>
+        <div class="central-canons-list">${itemsHtml}</div>
       `;
-    }).join('');
 
-    searchResults.innerHTML = `<div class="search-results-inner">${itemsHtml}</div>`;
-    searchResults.classList.add('has-results');
-    bindLangTabs(searchResults);
+      const clearBtn = document.getElementById('btnClearPanelSearch');
+      if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+          if (searchInput) searchInput.value = '';
+          clearSearchResults();
+        });
+      }
 
-    // Bind click handlers for search result items
-    searchResults.querySelectorAll('.search-result-item').forEach(item => {
-      item.addEventListener('click', (e) => {
-        if (e.target.closest('.lang-tabs-container') || e.target.closest('.btn-copiar-cita') || e.target.closest('.enlace-interpretacion')) return;
-        const num = parseInt(item.dataset.canon, 10);
-        showCanonDetail(num);
+      bindCanonCardEvents(mainPanel);
+    } else {
+      searchResults.innerHTML = `<div class="search-results-inner">${itemsHtml}</div>`;
+      searchResults.classList.add('has-results');
+      bindCanonCardEvents(searchResults, () => {
         clearSearchResults();
         if (searchInput) searchInput.value = '';
       });
-      item.addEventListener('keydown', (e) => {
-        if (e.target.closest('.lang-tabs-container')) return;
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          const num = parseInt(item.dataset.canon, 10);
-          showCanonDetail(num);
-          clearSearchResults();
-          if (searchInput) searchInput.value = '';
-        }
-      });
-    });
+    }
   }
 
   function clearSearchResults() {
     if (searchResults) {
       searchResults.innerHTML = '';
       searchResults.classList.remove('has-results');
+    }
+    if (!activeTreeNode) {
+      exitReadingView();
+      return;
+    }
+    const mainPanel = document.getElementById('codexMainPanel');
+    if (mainPanel) {
+      renderCentralCanons(activeTreeNode);
     }
   }
 
@@ -744,13 +937,6 @@ document.addEventListener('DOMContentLoaded', () => {
         clearSearchResults();
         searchInput.value = '';
         searchInput.blur();
-      }
-    });
-
-    // Close results when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.search-container')) {
-        clearSearchResults();
       }
     });
   }
@@ -832,16 +1018,28 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // When switching to inicio, reset canon detail view
+    // When switching to inicio, return to Estado 1 (Vista de Inicio)
     if (sectionId === 'inicio') {
-      hideCanonDetail();
-      clearSearchResults();
-      if (searchInput) searchInput.value = '';
+      exitReadingView();
     }
 
     if (window.innerWidth <= 768) closeSidebar();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+  // Logo superior izquierdo ('Gracianus') -> regresar a Vista de Inicio
+  [sidebarBrandBtn, mobileBrandBtn].forEach(brandEl => {
+    if (!brandEl) return;
+    brandEl.addEventListener('click', () => {
+      switchSection('inicio');
+    });
+    brandEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        switchSection('inicio');
+      }
+    });
+  });
 
   navLinks.forEach(link => {
     link.addEventListener('click', (e) => {

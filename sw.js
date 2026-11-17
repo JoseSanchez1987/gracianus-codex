@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gracianus-v10';
+const CACHE_NAME = 'gracianus-v16';
 
 // Relative URLs resolved against sw.js scope (works both in local dev and GitHub Pages subdirectory).
 const SCOPE_URL = './';
@@ -11,7 +11,7 @@ const urlsToCache = [
   './script.js',
   './data.worker.js',
   './pwa.js',
-  './data_multilingue_final.json',
+  './data_jerarquica_final.json',
   './temas_data.js',
   './pe_data.js',
   './praedicate_evangelium.json',
