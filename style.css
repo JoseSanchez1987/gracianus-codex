@@ -1408,6 +1408,15 @@ mark {
   margin-bottom: 20px;
 }
 
+.canon-detail-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
 .canon-detail-badge {
   display: inline-block;
   font-size: 0.7rem;
@@ -1419,7 +1428,144 @@ mark {
   border: 1px solid var(--color-accent-border);
   padding: 5px 14px;
   border-radius: 100px;
-  margin-bottom: 14px;
+  margin-bottom: 0;
+}
+
+.reader-mode-selector {
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-bg-warm, #F5F2ED);
+  border: 1px solid var(--color-border-light, #EDE9E3);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.reader-mode-btn {
+  background: none;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-slate, #5A6577);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.reader-mode-btn:hover {
+  color: var(--color-navy-dark, #1E2D42);
+}
+
+.reader-mode-btn.active {
+  background: var(--color-surface, #FFFFFF);
+  color: var(--color-navy, #2C3E5A);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+/* --- Modos de Lectura Dual y Multilingüe dentro del Lector --- */
+.reader-dual-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.reader-dual-col {
+  min-width: 0;
+}
+
+.reader-dual-col:last-child {
+  border-left: 1px solid var(--color-border-light, #EDE9E3);
+  padding-left: 24px;
+}
+
+.reader-col-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border-light, #EDE9E3);
+}
+
+.reader-lang-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--color-navy, #2C3E5A);
+  background: var(--color-accent-soft, rgba(59, 89, 152, 0.08));
+  border: 1px solid var(--color-accent-border, rgba(59, 89, 152, 0.2));
+  flex-shrink: 0;
+}
+
+.reader-lang-badge.is-official {
+  background: var(--color-navy, #2C3E5A);
+  color: #FFFFFF;
+  border-color: var(--color-navy, #2C3E5A);
+}
+
+.reader-dual-select {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--color-navy-dark, #1E2D42);
+  background: var(--color-bg, #FAF8F5);
+  border: 1px solid var(--color-border, #E2DDD6);
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.reader-col-text {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.reader-multi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.reader-multi-card {
+  min-width: 0;
+  padding: 16px 18px;
+  background: var(--color-bg, #FAF8F5);
+  border: 1px solid var(--color-border-light, #EDE9E3);
+  border-radius: 10px;
+}
+
+.reader-multi-card.is-official-latin {
+  grid-column: 1 / -1;
+  background: var(--color-surface, #FFFFFF);
+  border-color: var(--color-accent-border, rgba(59, 89, 152, 0.25));
+  box-shadow: inset 3px 0 0 var(--color-navy, #2C3E5A);
+}
+
+.reader-multi-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.reader-multi-name {
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--color-slate, #5A6577);
 }
 
 .canon-detail-title {
@@ -2817,6 +2963,19 @@ mark {
   .main-content.view-reading .codex-split-layout {
     grid-template-columns: 1fr;
     gap: 14px;
+  }
+
+  .reader-dual-grid,
+  .reader-multi-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .reader-dual-col:last-child {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid var(--color-border-light, #EDE9E3);
+    padding-top: 14px;
   }
 
   .codex-mobile-tree-toggle {

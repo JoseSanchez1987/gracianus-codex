@@ -235,7 +235,14 @@
           <span>Volver</span>
         </button>
         <div class="canon-detail-header">
-          <span class="canon-detail-badge" id="canonDetailBadge"></span>
+          <div class="canon-detail-top-bar">
+            <span class="canon-detail-badge" id="canonDetailBadge"></span>
+            <div class="reader-mode-selector" id="canonDetailModeSelector" role="group" aria-label="Modo de lectura">
+              <button type="button" class="reader-mode-btn active" data-view-mode="simple" aria-pressed="true">Simple</button>
+              <button type="button" class="reader-mode-btn" data-view-mode="dual" aria-pressed="false">Dual</button>
+              <button type="button" class="reader-mode-btn" data-view-mode="multi" aria-pressed="false">Multilingüe</button>
+            </div>
+          </div>
           <div class="canon-title-row">
             <h3 class="canon-detail-title canon-numero" id="canonDetailTitle"></h3>
             <div class="lang-tabs-container" id="canonDetailLangTabs"></div>

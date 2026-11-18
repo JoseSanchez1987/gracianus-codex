@@ -12,12 +12,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Strict language tab order & JSON property mapping (state is local per canon card)
   const LANG_TABS = [
-    { label: 'ES',  prop: 'texto' },
-    { label: 'LAT', prop: 'texto_latin' },
-    { label: 'EN',  prop: 'texto_ingles' },
-    { label: 'IT',  prop: 'texto_italiano' },
-    { label: 'FR',  prop: 'texto_frances' }
+    { code: 'es', label: 'ES',  name: 'Español',  prop: 'texto' },
+    { code: 'la', label: 'LAT', name: 'Latín',    prop: 'texto_latin' },
+    { code: 'en', label: 'EN',  name: 'Inglés',   prop: 'texto_ingles' },
+    { code: 'it', label: 'IT',  name: 'Italiano', prop: 'texto_italiano' },
+    { code: 'fr', label: 'FR',  name: 'Francés',  prop: 'texto_frances' }
   ];
+
+  // Reader preferences persisted in localStorage
+  const READER_PREF_KEYS = {
+    mode: 'gracianus_reader_mode',
+    singleLang: 'gracianus_reader_single_lang',
+    dualLeft: 'gracianus_reader_dual_left',
+    dualRight: 'gracianus_reader_dual_right'
+  };
+
+  function getReaderPrefs() {
+    try {
+      const mode = localStorage.getItem(READER_PREF_KEYS.mode);
+      const singleLang = localStorage.getItem(READER_PREF_KEYS.singleLang);
+      const dualLeft = localStorage.getItem(READER_PREF_KEYS.dualLeft);
+      const dualRight = localStorage.getItem(READER_PREF_KEYS.dualRight);
+      const validCodes = new Set(LANG_TABS.map(l => l.code));
+      return {
+        mode: (mode === 'simple' || mode === 'dual' || mode === 'multi') ? mode : 'simple',
+        singleLang: validCodes.has(singleLang) ? singleLang : 'es',
+        dualLeft: validCodes.has(dualLeft) ? dualLeft : 'la',
+        dualRight: validCodes.has(dualRight) ? dualRight : 'es'
+      };
+    } catch (e) {
+      return { mode: 'simple', singleLang: 'es', dualLeft: 'la', dualRight: 'es' };
+    }
+  }
+
+  function saveReaderPref(key, value) {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {}
+  }
 
   // --- DOM References ---
   const mainContent    = document.getElementById('mainContent') || document.querySelector('.main-content');
@@ -200,12 +232,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return Boolean(canon && typeof canon[prop] === 'string' && canon[prop].trim() !== '');
   }
 
-  function buildLangTabsButtonsHtml(canon) {
+  function buildLangTabsButtonsHtml(canon, activeCode = 'es') {
     if (!canon) return '';
     return LANG_TABS.map(lang => {
       if (!hasValidLangText(canon, lang.prop)) return '';
-      const isSpanishDefault = lang.prop === 'texto';
-      return `<button type="button" class="lang-tab${isSpanishDefault ? ' active' : ''}" data-prop="${lang.prop}" data-canon="${canon.numero}" aria-selected="${isSpanishDefault}">${lang.label}</button>`;
+      const isActive = lang.code === activeCode;
+      return `<button type="button" class="lang-tab${isActive ? ' active' : ''}" data-lang="${lang.code}" data-prop="${lang.prop}" data-canon="${canon.numero}" aria-selected="${isActive}">${lang.label}</button>`;
     }).join('');
   }
 
@@ -226,6 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.stopPropagation();
 
         const prop = tab.dataset.prop;
+        const langCode = tab.dataset.lang;
         const canonNum = parseInt(tab.dataset.canon, 10);
         if (!prop || Number.isNaN(canonNum)) return;
 
@@ -245,6 +278,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update only the text container belonging to this specific canon card
         const card = tab.closest('#canonDetail, .search-result-item, .accordion-canon-item, .canon-card');
+        if (card && card.id === 'canonDetail' && langCode) {
+          saveReaderPref(READER_PREF_KEYS.singleLang, langCode);
+        }
         const textEl = card ? card.querySelector('.canon-detail-body, .search-result-excerpt, .canon-preview-text, .canon-texto') : null;
         if (!textEl) return;
 
@@ -676,6 +712,144 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function getCanonTextByCode(canon, code) {
+    const langObj = LANG_TABS.find(l => l.code === code) || LANG_TABS[0];
+    return (canon && typeof canon[langObj.prop] === 'string') ? canon[langObj.prop] : '';
+  }
+
+  function renderDetailBodyByMode(canon) {
+    const bodyEl = document.getElementById('canonDetailBody');
+    const detailLangTabs = document.getElementById('canonDetailLangTabs');
+    const modeSelector = document.getElementById('canonDetailModeSelector');
+    if (!bodyEl || !canon) return;
+
+    const prefs = getReaderPrefs();
+    const mode = prefs.mode;
+
+    if (modeSelector) {
+      modeSelector.querySelectorAll('.reader-mode-btn').forEach(btn => {
+        const isCurrent = btn.dataset.viewMode === mode;
+        btn.classList.toggle('active', isCurrent);
+        btn.setAttribute('aria-pressed', String(isCurrent));
+      });
+    }
+
+    // Show single-language pills only in Simple mode
+    if (detailLangTabs) {
+      if (mode === 'simple') {
+        const activeCode = hasValidLangText(canon, (LANG_TABS.find(l => l.code === prefs.singleLang) || LANG_TABS[0]).prop)
+          ? prefs.singleLang
+          : 'es';
+        detailLangTabs.style.display = '';
+        detailLangTabs.innerHTML = buildLangTabsButtonsHtml(canon, activeCode);
+        bindLangTabs(detailLangTabs);
+      } else {
+        detailLangTabs.style.display = 'none';
+        detailLangTabs.innerHTML = '';
+      }
+    }
+
+    bodyEl.classList.remove('is-mode-simple', 'is-mode-dual', 'is-mode-multi');
+
+    if (mode === 'dual') {
+      bodyEl.classList.add('is-mode-dual');
+      const availableLangs = LANG_TABS.filter(l => hasValidLangText(canon, l.prop));
+      const leftCode = availableLangs.some(l => l.code === prefs.dualLeft) ? prefs.dualLeft : (availableLangs[0] ? availableLangs[0].code : 'la');
+      const rightCode = availableLangs.some(l => l.code === prefs.dualRight) ? prefs.dualRight : (availableLangs[1] ? availableLangs[1].code : 'es');
+
+      const buildOptions = (selectedCode) => availableLangs.map(l =>
+        `<option value="${l.code}"${l.code === selectedCode ? ' selected' : ''}>${l.label} — ${l.name}</option>`
+      ).join('');
+
+      bodyEl.innerHTML = `
+        <div class="reader-dual-grid">
+          <div class="reader-dual-col">
+            <div class="reader-col-header">
+              <span class="reader-lang-badge">${escapeHtml(leftCode.toUpperCase() === 'LA' ? 'LAT' : leftCode.toUpperCase())}</span>
+              <select class="reader-dual-select" data-side="left" aria-label="Idioma columna izquierda">
+                ${buildOptions(leftCode)}
+              </select>
+            </div>
+            <div class="reader-col-text" data-dual-text="left">${escapeHtml(getCanonTextByCode(canon, leftCode))}</div>
+          </div>
+          <div class="reader-dual-col">
+            <div class="reader-col-header">
+              <span class="reader-lang-badge">${escapeHtml(rightCode.toUpperCase() === 'LA' ? 'LAT' : rightCode.toUpperCase())}</span>
+              <select class="reader-dual-select" data-side="right" aria-label="Idioma columna derecha">
+                ${buildOptions(rightCode)}
+              </select>
+            </div>
+            <div class="reader-col-text" data-dual-text="right">${escapeHtml(getCanonTextByCode(canon, rightCode))}</div>
+          </div>
+        </div>
+      `;
+
+      bodyEl.querySelectorAll('.reader-dual-select').forEach(sel => {
+        sel.addEventListener('change', () => {
+          const side = sel.dataset.side;
+          const chosenCode = sel.value;
+          saveReaderPref(side === 'left' ? READER_PREF_KEYS.dualLeft : READER_PREF_KEYS.dualRight, chosenCode);
+          const col = sel.closest('.reader-dual-col');
+          const badge = col && col.querySelector('.reader-lang-badge');
+          const textBox = col && col.querySelector('.reader-col-text');
+          const langObj = LANG_TABS.find(l => l.code === chosenCode);
+          if (badge && langObj) badge.textContent = langObj.label;
+          if (textBox) textBox.textContent = getCanonTextByCode(canon, chosenCode);
+        });
+      });
+      return;
+    }
+
+    if (mode === 'multi') {
+      bodyEl.classList.add('is-mode-multi');
+      // Latín primero como texto oficial, seguido de ES, EN, IT, FR
+      const multiOrder = ['la', 'es', 'en', 'it', 'fr']
+        .map(code => LANG_TABS.find(l => l.code === code))
+        .filter(l => l && hasValidLangText(canon, l.prop));
+
+      bodyEl.innerHTML = `
+        <div class="reader-multi-grid">
+          ${multiOrder.map(l => {
+            const isOfficialLatin = l.code === 'la';
+            return `
+              <div class="reader-multi-card${isOfficialLatin ? ' is-official-latin' : ''}">
+                <div class="reader-multi-header">
+                  <span class="reader-lang-badge${isOfficialLatin ? ' is-official' : ''}">${l.label}</span>
+                  <span class="reader-multi-name">${l.name}${isOfficialLatin ? ' · Texto oficial' : ''}</span>
+                </div>
+                <div class="reader-col-text">${escapeHtml(canon[l.prop])}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+      return;
+    }
+
+    // Modo Simple (por defecto)
+    bodyEl.classList.add('is-mode-simple');
+    const simpleLangObj = LANG_TABS.find(l => l.code === prefs.singleLang);
+    const activeProp = (simpleLangObj && hasValidLangText(canon, simpleLangObj.prop)) ? simpleLangObj.prop : 'texto';
+    bodyEl.textContent = canon[activeProp] || '';
+  }
+
+  // Bind mode selector buttons once
+  const detailModeSelector = document.getElementById('canonDetailModeSelector');
+  if (detailModeSelector) {
+    detailModeSelector.querySelectorAll('.reader-mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const nextMode = btn.dataset.viewMode;
+        if (!nextMode) return;
+        saveReaderPref(READER_PREF_KEYS.mode, nextMode);
+        const currentCanonNum = canonDetail ? parseInt(canonDetail.dataset.canon, 10) : NaN;
+        const currentCanon = !Number.isNaN(currentCanonNum) ? findCanon(currentCanonNum) : null;
+        if (currentCanon) {
+          renderDetailBodyByMode(currentCanon);
+        }
+      });
+    });
+  }
+
   function showCanonDetail(numero) {
     const canon = findCanon(numero);
     if (!canon) return;
@@ -705,18 +879,8 @@ document.addEventListener('DOMContentLoaded', () => {
       metaContainer.innerHTML = metaHtml;
     }
 
-    // Multilingual tabs directly above the canon body text (Español active by default)
-    const detailLangTabs = document.getElementById('canonDetailLangTabs');
-    if (detailLangTabs) {
-      detailLangTabs.innerHTML = buildLangTabsButtonsHtml(canon);
-      bindLangTabs(detailLangTabs);
-    }
-
-    // Initial body text always in Spanish (canon.texto)
-    const bodyEl = document.getElementById('canonDetailBody');
-    if (bodyEl) {
-      bodyEl.textContent = canon.texto || '';
-    }
+    // Render canon body according to persisted Simple / Dual / Multilingüe mode
+    renderDetailBodyByMode(canon);
 
     // Interpretación Auténtica y Copiar Cita
     const interpContainer = document.getElementById('canonDetailInterp');
