@@ -262,7 +262,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // =====================================================================
 
   const treeNodeMap = new Map();
+  const canonToNodeMap = new Map();
   let activeTreeNode = null;
+  let activeReadingCanonNum = null;
 
   /**
    * Reutiliza exactamente el diseño de tarjeta de búsqueda estabilizado
@@ -334,6 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
       mainContent.classList.remove('view-reading');
     }
     activeTreeNode = null;
+    activeReadingCanonNum = null;
     if (searchInput) searchInput.value = '';
     if (searchResults) {
       searchResults.innerHTML = '';
@@ -350,6 +353,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     hideCanonDetail();
     renderCentralCanons(null);
+  }
+
+  function highlightCanonInTreeAndPanel(canonNum) {
+    const n = Number(canonNum);
+    activeReadingCanonNum = n;
+
+    // 1. Resaltar tarjeta del canon activo en el panel derecho (si está visible ahí)
+    const mainPanel = document.getElementById('codexMainPanel');
+    if (mainPanel) {
+      mainPanel.querySelectorAll('.search-result-item.is-reading-canon').forEach(el => {
+        el.classList.remove('is-reading-canon');
+      });
+      const activeCard = mainPanel.querySelector(`.search-result-item[data-canon="${n}"]`);
+      if (activeCard) {
+        activeCard.classList.add('is-reading-canon');
+      }
+    }
+
+    // 2. Conservar ramas abiertas y desplegar/resaltar la ruta del canon en el árbol lateral
+    const sidebarTree = document.getElementById('codexTreeSidebar');
+    const nodeId = canonToNodeMap.get(n);
+    if (!sidebarTree || !nodeId) return;
+
+    const targetBtn = sidebarTree.querySelector(`.tree-select-btn[data-node-id="${nodeId}"]`);
+    if (!targetBtn) return;
+
+    // Desplegar únicamente los ancestros necesarios sin cerrar otras ramas ya abiertas
+    let parentLi = targetBtn.closest('.tree-node');
+    while (parentLi) {
+      const childrenBox = parentLi.querySelector(':scope > .tree-children');
+      const toggleBtn = parentLi.querySelector(':scope > .tree-node-row > .tree-toggle-btn');
+      if (childrenBox && childrenBox.hidden) {
+        childrenBox.hidden = false;
+        if (toggleBtn) {
+          toggleBtn.setAttribute('aria-expanded', 'true');
+          toggleBtn.textContent = '▾';
+        }
+      }
+      parentLi = parentLi.parentElement ? parentLi.parentElement.closest('.tree-node') : null;
+    }
+
+    sidebarTree.querySelectorAll('.tree-select-btn.active').forEach(el => el.classList.remove('active'));
+    targetBtn.classList.add('active');
+    const targetNode = treeNodeMap.get(nodeId);
+    if (targetNode) {
+      activeTreeNode = targetNode;
+    }
   }
 
   function buildHomeBooksHtml(libros) {
@@ -374,6 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderCodexSplitView() {
     if (!dbData || !accordionContainer) return;
     treeNodeMap.clear();
+    canonToNodeMap.clear();
     activeTreeNode = null;
 
     accordionContainer.innerHTML = `
@@ -422,6 +473,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const itemsHtml = nodes.map((node) => {
       treeNodeMap.set(node._id, node);
+      if (Array.isArray(node.canones)) {
+        node.canones.forEach(num => canonToNodeMap.set(Number(num), node._id));
+      }
 
       const hasChildren = Array.isArray(node._children) && node._children.length > 0;
       const hasDirectCanones = Array.isArray(node.canones) && node.canones.length > 0;
@@ -570,6 +624,11 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
 
     bindCanonCardEvents(mainPanel);
+
+    if (activeReadingCanonNum !== null) {
+      const activeCard = mainPanel.querySelector(`.search-result-item[data-canon="${activeReadingCanonNum}"]`);
+      if (activeCard) activeCard.classList.add('is-reading-canon');
+    }
   }
 
   // =====================================================================
@@ -672,24 +731,39 @@ document.addEventListener('DOMContentLoaded', () => {
     // Update navigation controls (Previous / Next)
     updateCanonNav(canon.numero);
 
-    // Show detail, hide accordion
+    // Ensure reading workspace & hierarchical tree stay visible right below the canon detail viewer
+    enterReadingView();
+    if (accordionSection) {
+      accordionSection.style.display = '';
+    }
+
     if (canonDetail) {
       canonDetail.style.display = 'block';
       canonDetail.style.animation = 'none';
       canonDetail.offsetHeight; // reflow
       canonDetail.style.animation = '';
     }
-    if (accordionSection) {
-      accordionSection.style.display = 'none';
-    }
 
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    highlightCanonInTreeAndPanel(canon.numero);
+
+    // Smooth scroll to the newly opened canon reader at the top (keeping tree accessible below)
+    if (canonDetail) {
+      canonDetail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   function hideCanonDetail() {
     if (canonDetail) canonDetail.style.display = 'none';
     if (accordionSection) accordionSection.style.display = '';
+    activeReadingCanonNum = null;
+    const mainPanel = document.getElementById('codexMainPanel');
+    if (mainPanel) {
+      mainPanel.querySelectorAll('.search-result-item.is-reading-canon').forEach(el => {
+        el.classList.remove('is-reading-canon');
+      });
+    }
   }
 
   if (canonDetailBack) {

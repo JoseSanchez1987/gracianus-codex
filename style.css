@@ -1361,8 +1361,24 @@ mark {
 /* --- Canon Detail Viewer --- */
 .canon-detail {
   max-width: 720px;
-  margin: 0 auto;
+  margin: 0 auto 32px;
+  scroll-margin-top: 24px;
   animation: fadeIn 0.35s ease;
+}
+
+.main-content.view-reading .canon-detail {
+  max-width: 100%;
+  margin-bottom: 28px;
+}
+
+.search-result-item.is-reading-canon {
+  background: var(--color-accent-soft, rgba(59, 89, 152, 0.08));
+  box-shadow: inset 3px 0 0 var(--color-navy, #2C3E5A);
+}
+
+.search-result-item.is-reading-canon .search-result-number {
+  background: var(--color-navy, #2C3E5A);
+  color: #FFFFFF;
 }
 
 .canon-detail-back {
@@ -2794,6 +2810,10 @@ mark {
 }
 
 @media (max-width: 768px) {
+  .canon-detail {
+    scroll-margin-top: 76px;
+  }
+
   .main-content.view-reading .codex-split-layout {
     grid-template-columns: 1fr;
     gap: 14px;
