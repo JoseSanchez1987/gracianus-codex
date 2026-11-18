@@ -63,7 +63,6 @@ window.DB_JERARQUICA_DATA = {
             {
               "nombre": "Capítulo I: Normas comunes",
               "canones": [
-                34,
                 35,
                 36,
                 37,
@@ -375,7 +374,6 @@ window.DB_JERARQUICA_DATA = {
             {
               "nombre": "Título I: De las obligaciones y derechos de todos los fieles",
               "canones": [
-                22,
                 208,
                 209,
                 210,
@@ -397,7 +395,6 @@ window.DB_JERARQUICA_DATA = {
             {
               "nombre": "Título II: De las obligaciones y derechos de los fieles laicos",
               "canones": [
-                28,
                 224,
                 225,
                 226,
@@ -414,7 +411,6 @@ window.DB_JERARQUICA_DATA = {
                 {
                   "nombre": "Capítulo I: De la formación de los clérigos",
                   "canones": [
-                    34,
                     232,
                     233,
                     234,
@@ -453,7 +449,6 @@ window.DB_JERARQUICA_DATA = {
                 {
                   "nombre": "Capítulo II: De la adscripción o incardinación de los clérigos",
                   "canones": [
-                    34,
                     265,
                     266,
                     267,
@@ -467,7 +462,6 @@ window.DB_JERARQUICA_DATA = {
                 {
                   "nombre": "Capítulo III: De las obligaciones y derechos de los clérigos",
                   "canones": [
-                    34,
                     273,
                     274,
                     275,
@@ -490,7 +484,6 @@ window.DB_JERARQUICA_DATA = {
                 {
                   "nombre": "Capítulo IV: De la pérdida del estado clerical",
                   "canones": [
-                    34,
                     290,
                     291,
                     292,
@@ -647,7 +640,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo I: De las Iglesias particulares",
                       "canones": [
-                        22,
                         368,
                         369,
                         370,
@@ -661,7 +653,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo II: De los Obispos",
                       "canones": [
-                        22,
                         376,
                         377,
                         378,
@@ -672,7 +663,6 @@ window.DB_JERARQUICA_DATA = {
                         {
                           "nombre": "De los Obispos diocesanos",
                           "canones": [
-                            22,
                             381,
                             382,
                             383,
@@ -700,7 +690,6 @@ window.DB_JERARQUICA_DATA = {
                         {
                           "nombre": "De los Obispos coadjutores y auxiliares",
                           "canones": [
-                            22,
                             403,
                             404,
                             405,
@@ -720,7 +709,6 @@ window.DB_JERARQUICA_DATA = {
                         {
                           "nombre": "De la sede impedida",
                           "canones": [
-                            22,
                             412,
                             413,
                             414,
@@ -730,7 +718,6 @@ window.DB_JERARQUICA_DATA = {
                         {
                           "nombre": "De la sede vacante",
                           "canones": [
-                            22,
                             416,
                             417,
                             418,
@@ -758,7 +745,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo I: De las Provincias eclesiásticas y de las Regiones eclesiásticas",
                       "canones": [
-                        28,
                         431,
                         432,
                         433,
@@ -768,7 +754,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo II: De los Metropolitanos",
                       "canones": [
-                        28,
                         435,
                         436,
                         437,
@@ -778,7 +763,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo III: De los Concilios particulares",
                       "canones": [
-                        28,
                         439,
                         440,
                         441,
@@ -792,7 +776,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo IV: De las Conferencias Episcopales",
                       "canones": [
-                        28,
                         447,
                         448,
                         449,
@@ -816,7 +799,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo I: Del Sínodo Diocesano",
                       "canones": [
-                        34,
                         460,
                         461,
                         462,
@@ -831,7 +813,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo II: De la curia diocesana",
                       "canones": [
-                        34,
                         469,
                         470,
                         471,
@@ -843,7 +824,6 @@ window.DB_JERARQUICA_DATA = {
                         {
                           "nombre": "De los Vicarios generales y episcopales",
                           "canones": [
-                            34,
                             475,
                             476,
                             477,
@@ -856,7 +836,6 @@ window.DB_JERARQUICA_DATA = {
                         {
                           "nombre": "Del canciller y otros notarios, y de los archivos",
                           "canones": [
-                            34,
                             482,
                             483,
                             484,
@@ -872,7 +851,6 @@ window.DB_JERARQUICA_DATA = {
                         {
                           "nombre": "Del consejo de asuntos económicos y del ecónomo",
                           "canones": [
-                            34,
                             492,
                             493,
                             494
@@ -883,7 +861,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo III: Del consejo presbiteral y del colegio de consultores",
                       "canones": [
-                        34,
                         495,
                         496,
                         497,
@@ -897,7 +874,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo IV: De los cabildos de canónigos",
                       "canones": [
-                        34,
                         503,
                         504,
                         505,
@@ -911,7 +887,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo V: Del consejo pastoral",
                       "canones": [
-                        34,
                         511,
                         512,
                         513,
@@ -921,7 +896,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo VI: De las parroquias, de los párrocos y de los vicarios parroquiales",
                       "canones": [
-                        34,
                         515,
                         516,
                         517,
@@ -965,7 +939,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo VII: De los arciprestes",
                       "canones": [
-                        34,
                         553,
                         554,
                         555
@@ -974,7 +947,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo VIII: De los rectores de las iglesias y de los capellanes",
                       "canones": [
-                        34,
                         556,
                         557,
                         558,
@@ -1009,7 +981,6 @@ window.DB_JERARQUICA_DATA = {
                 {
                   "nombre": "Título I: Normas Comunes de todos los Institutos de Vida Consagrada",
                   "canones": [
-                    22,
                     573,
                     574,
                     575,
@@ -1049,14 +1020,12 @@ window.DB_JERARQUICA_DATA = {
                 {
                   "nombre": "Título II: De los institutos religiosos",
                   "canones": [
-                    28,
                     607
                   ],
                   "capitulos": [
                     {
                       "nombre": "Capítulo I: De las casas religiosas y de su erección y supresión",
                       "canones": [
-                        28,
                         608,
                         609,
                         610,
@@ -1071,7 +1040,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo II: Del gobierno de los institutos",
                       "canones": [
-                        28,
                         617,
                         618,
                         619,
@@ -1094,7 +1062,6 @@ window.DB_JERARQUICA_DATA = {
                         {
                           "nombre": "De los bienes temporales y de su administración",
                           "canones": [
-                            28,
                             634,
                             635,
                             636,
@@ -1109,7 +1076,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo III: De la admisión de los candidatos y de la formación de los miembros",
                       "canones": [
-                        28,
                         641,
                         642,
                         643,
@@ -1118,16 +1084,9 @@ window.DB_JERARQUICA_DATA = {
                       ],
                       "articulos": [
                         {
-                          "nombre": "Art. 2: Del noviciado y de la formación de los novicios",
-                          "canones": [
-                            28,
-                            646
-                          ]
-                        },
-                        {
                           "nombre": "Del noviciado y de la formación de los novicios",
                           "canones": [
-                            28,
+                            646,
                             647,
                             648,
                             649,
@@ -1140,7 +1099,6 @@ window.DB_JERARQUICA_DATA = {
                         {
                           "nombre": "De la profesión religiosa",
                           "canones": [
-                            28,
                             654,
                             655,
                             656,
@@ -1151,7 +1109,6 @@ window.DB_JERARQUICA_DATA = {
                         {
                           "nombre": "De la formación de los religiosos",
                           "canones": [
-                            28,
                             659,
                             660,
                             661
@@ -1162,7 +1119,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo IV: De las obligaciones y derechos de los institutos y de sus miembros",
                       "canones": [
-                        28,
                         662,
                         663,
                         664,
@@ -1179,7 +1135,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo V: Del apostolado de los institutos",
                       "canones": [
-                        28,
                         673,
                         674,
                         675,
@@ -1199,7 +1154,6 @@ window.DB_JERARQUICA_DATA = {
                         {
                           "nombre": "Del tránsito a otro instituto",
                           "canones": [
-                            28,
                             684,
                             685
                           ]
@@ -1207,7 +1161,6 @@ window.DB_JERARQUICA_DATA = {
                         {
                           "nombre": "De la salida del instituto",
                           "canones": [
-                            28,
                             686,
                             687,
                             688,
@@ -1221,7 +1174,6 @@ window.DB_JERARQUICA_DATA = {
                         {
                           "nombre": "De la expulsión de los miembros",
                           "canones": [
-                            28,
                             694,
                             695,
                             696,
@@ -1240,7 +1192,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo VII: De los religiosos elevados al Episcopado",
                       "canones": [
-                        28,
                         705,
                         706,
                         707
@@ -1249,7 +1200,6 @@ window.DB_JERARQUICA_DATA = {
                     {
                       "nombre": "Capítulo VIII: De las conferencias de Superiores mayores",
                       "canones": [
-                        28,
                         708,
                         709
                       ]
@@ -1259,7 +1209,6 @@ window.DB_JERARQUICA_DATA = {
                 {
                   "nombre": "Título III: De los institutos seculares",
                   "canones": [
-                    34,
                     710,
                     711,
                     712,
@@ -1316,7 +1265,6 @@ window.DB_JERARQUICA_DATA = {
         {
           "nombre": "Título I: El ministerio de la palabra divina",
           "canones": [
-            22,
             747,
             748,
             749,
@@ -1337,7 +1285,6 @@ window.DB_JERARQUICA_DATA = {
             {
               "nombre": "Capítulo I: De la predicación de la palabra de Dios",
               "canones": [
-                22,
                 762,
                 763,
                 764,
@@ -1354,7 +1301,6 @@ window.DB_JERARQUICA_DATA = {
             {
               "nombre": "Capítulo II: De la formación catequética",
               "canones": [
-                22,
                 773,
                 774,
                 775,
@@ -1370,7 +1316,6 @@ window.DB_JERARQUICA_DATA = {
         {
           "nombre": "Título II: De la actividad misional de la Iglesia",
           "canones": [
-            28,
             781,
             782,
             783,
@@ -1388,7 +1333,6 @@ window.DB_JERARQUICA_DATA = {
         {
           "nombre": "Título III: De la educación católica",
           "canones": [
-            34,
             793,
             794,
             795
@@ -1397,7 +1341,6 @@ window.DB_JERARQUICA_DATA = {
             {
               "nombre": "Capítulo I: De la escuela",
               "canones": [
-                34,
                 796,
                 797,
                 798,
@@ -1414,7 +1357,6 @@ window.DB_JERARQUICA_DATA = {
             {
               "nombre": "Capítulo II: De las universidades católicas y otros institutos católicos de estudios superiores",
               "canones": [
-                34,
                 807,
                 808,
                 809,
@@ -1428,7 +1370,6 @@ window.DB_JERARQUICA_DATA = {
             {
               "nombre": "Capítulo III: De las universidades y facultades eclesiásticas",
               "canones": [
-                34,
                 815,
                 816,
                 817,
@@ -1490,14 +1431,12 @@ window.DB_JERARQUICA_DATA = {
             {
               "nombre": "Título I: Del Bautismo",
               "canones": [
-                22,
                 849
               ],
               "capitulos": [
                 {
                   "nombre": "Capítulo I: De la celebración del Bautismo",
                   "canones": [
-                    22,
                     850,
                     851,
                     852,
@@ -1514,7 +1453,6 @@ window.DB_JERARQUICA_DATA = {
                 {
                   "nombre": "Capítulo II: Del ministro del Bautismo",
                   "canones": [
-                    22,
                     861,
                     862,
                     863
@@ -1523,7 +1461,6 @@ window.DB_JERARQUICA_DATA = {
                 {
                   "nombre": "Capítulo III: De los que van a ser bautizados",
                   "canones": [
-                    22,
                     864,
                     865,
                     866,
@@ -1537,7 +1474,6 @@ window.DB_JERARQUICA_DATA = {
                 {
                   "nombre": "Capítulo IV: De los padrinos",
                   "canones": [
-                    22,
                     872,
                     873,
                     874
@@ -1546,7 +1482,6 @@ window.DB_JERARQUICA_DATA = {
                 {
                   "nombre": "Capítulo V: De la prueba y anotación del Bautismo administrado",
                   "canones": [
-                    22,
                     875,
                     876,
                     877,
@@ -1558,14 +1493,12 @@ window.DB_JERARQUICA_DATA = {
             {
               "nombre": "Título II: Del sacramento de la Confirmación",
               "canones": [
-                28,
                 879
               ],
               "capitulos": [
                 {
                   "nombre": "Capítulo I: Del modo de celebrar la Confirmación",
                   "canones": [
-                    28,
                     880,
                     881
                   ]
@@ -1573,7 +1506,6 @@ window.DB_JERARQUICA_DATA = {
                 {
                   "nombre": "Capítulo II: Del ministro de la Confirmación",
                   "canones": [
-                    28,
                     882,
                     883,
                     884,
@@ -1586,7 +1518,6 @@ window.DB_JERARQUICA_DATA = {
                 {
                   "nombre": "Capítulo III: De los que van a ser confirmados",
                   "canones": [
-                    28,
                     889,
                     890,
                     891
@@ -1595,7 +1526,6 @@ window.DB_JERARQUICA_DATA = {
                 {
                   "nombre": "Capítulo IV: De los padrinos",
                   "canones": [
-                    28,
                     892,
                     893
                   ]
@@ -1603,7 +1533,6 @@ window.DB_JERARQUICA_DATA = {
                 {
                   "nombre": "Capítulo V: De la prueba y anotación de la Confirmación",
                   "canones": [
-                    28,
                     894,
                     895,
                     896
@@ -1614,74 +1543,73 @@ window.DB_JERARQUICA_DATA = {
             {
               "nombre": "Título III: De la santísima Eucaristía",
               "canones": [
-                34,
                 897,
                 898
               ],
               "capitulos": [
                 {
                   "nombre": "Capítulo I: De la celebración eucarística",
-                  "canones": [
-                    34,
-                    899,
-                    900,
-                    901,
-                    902,
-                    903,
-                    904,
-                    905,
-                    906,
-                    907,
-                    908,
-                    909,
-                    910,
-                    911
-                  ]
-                },
-                {
-                  "nombre": "Capítulo I: De la participación en la santísima Eucaristía",
-                  "canones": [
-                    34,
-                    912,
-                    913,
-                    914,
-                    915,
-                    916,
-                    917,
-                    918,
-                    919,
-                    920,
-                    921,
-                    922,
-                    923
-                  ]
-                },
-                {
-                  "nombre": "Capítulo I: De los ritos y ceremonias de la celebración eucarística",
-                  "canones": [
-                    34,
-                    924,
-                    925,
-                    926,
-                    927,
-                    928,
-                    929,
-                    930
-                  ]
-                },
-                {
-                  "nombre": "Capítulo I: Del tiempo y lugar de la celebración de la Eucaristía",
-                  "canones": [
-                    34,
-                    931,
-                    932,
-                    933
+                  "articulos": [
+                    {
+                      "nombre": "De la celebración eucarística",
+                      "canones": [
+                        899,
+                        900,
+                        901,
+                        902,
+                        903,
+                        904,
+                        905,
+                        906,
+                        907,
+                        908,
+                        909,
+                        910,
+                        911
+                      ]
+                    },
+                    {
+                      "nombre": "De la participación en la santísima Eucaristía",
+                      "canones": [
+                        912,
+                        913,
+                        914,
+                        915,
+                        916,
+                        917,
+                        918,
+                        919,
+                        920,
+                        921,
+                        922,
+                        923
+                      ]
+                    },
+                    {
+                      "nombre": "De los ritos y ceremonias de la celebración eucarística",
+                      "canones": [
+                        924,
+                        925,
+                        926,
+                        927,
+                        928,
+                        929,
+                        930
+                      ]
+                    },
+                    {
+                      "nombre": "Del tiempo y lugar de la celebración de la Eucaristía",
+                      "canones": [
+                        931,
+                        932,
+                        933
+                      ]
+                    }
                   ]
                 },
                 {
                   "nombre": "Capítulo II: De la reserva y veneración de la santísima Eucaristía",
                   "canones": [
-                    34,
                     934,
                     935,
                     936,
@@ -1698,7 +1626,6 @@ window.DB_JERARQUICA_DATA = {
                 {
                   "nombre": "Capítulo III: Del estipendio ofrecido para la celebración de la misa",
                   "canones": [
-                    34,
                     945,
                     946,
                     947,
@@ -2102,7 +2029,6 @@ window.DB_JERARQUICA_DATA = {
             {
               "nombre": "Título I: De los Sacramentales",
               "canones": [
-                22,
                 1166,
                 1167,
                 1168,
@@ -2115,7 +2041,6 @@ window.DB_JERARQUICA_DATA = {
             {
               "nombre": "Título II: De la liturgia de las horas",
               "canones": [
-                28,
                 1173,
                 1174,
                 1175
@@ -2124,14 +2049,12 @@ window.DB_JERARQUICA_DATA = {
             {
               "nombre": "Título III: De las exequias eclesiásticas",
               "canones": [
-                34,
                 1176
               ],
               "capitulos": [
                 {
                   "nombre": "Capítulo I: De la celebración de las exequias",
                   "canones": [
-                    34,
                     1177,
                     1178,
                     1179,
@@ -2143,7 +2066,6 @@ window.DB_JERARQUICA_DATA = {
                 {
                   "nombre": "Capítulo II: De aquellos a quienes se ha de conceder o denegar las exequias eclesiásticas",
                   "canones": [
-                    34,
                     1183,
                     1184,
                     1185
@@ -2553,9 +2475,15 @@ window.DB_JERARQUICA_DATA = {
       "partes": [
         {
           "nombre": "Parte I: De los juicios en general",
+          "canones": [
+            1400,
+            1401,
+            1402,
+            1403
+          ],
           "titulos": [
             {
-              "nombre": "Título I: Del fuero competente (cc. 1404-1416)",
+              "nombre": "Título I: Del fuero competente",
               "canones": [
                 1404,
                 1405,
@@ -2573,7 +2501,7 @@ window.DB_JERARQUICA_DATA = {
               ]
             },
             {
-              "nombre": "Título II: De los diversos grados y clases de tribunales (cc. 1417-1445)",
+              "nombre": "Título II: De los diversos grados y clases de tribunales",
               "canones": [
                 1417,
                 1418,
