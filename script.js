@@ -152,7 +152,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     canonMap.clear();
     dbData.canones.forEach(c => {
-      if (c && c.numero !== undefined) {
+      if (!c) return;
+      if (!alreadyNormalized) {
+        if (c._qTexto === undefined) c._qTexto = normalizeStr(c.texto);
+        if (c._qLatin === undefined) c._qLatin = normalizeStr(c.texto_latin);
+        if (!Array.isArray(c._qTemas)) {
+          c._qTemas = Array.isArray(c.temas) ? c.temas.map(normalizeStr) : [];
+        }
+      }
+      if (c.numero !== undefined) {
         canonMap.set(Number(c.numero), c);
       }
     });
@@ -299,8 +307,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const treeNodeMap = new Map();
   const canonToNodeMap = new Map();
+  const lastSearchMatchMeta = new Map();
   let activeTreeNode = null;
   let activeReadingCanonNum = null;
+  let activeSearchQuery = '';
+
+  function buildLatinExcerpt(latinText, query) {
+    if (!latinText || !query) return '';
+    const normText = normalizeStr(latinText);
+    const normQuery = normalizeStr(query);
+    const idx = normText.indexOf(normQuery);
+    if (idx === -1) return latinText.slice(0, 180) + (latinText.length > 180 ? '…' : '');
+    const start = Math.max(0, idx - 55);
+    const end = Math.min(latinText.length, idx + normQuery.length + 85);
+    const prefix = start > 0 ? '…' : '';
+    const suffix = end < latinText.length ? '…' : '';
+    return prefix + latinText.slice(start, end).trim() + suffix;
+  }
 
   /**
    * Reutiliza exactamente el diseño de tarjeta de búsqueda estabilizado
@@ -311,6 +334,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const defaultText = canon.texto || '';
     const bodyHtml = query ? highlightMatch(defaultText, query) : escapeHtml(defaultText);
     const queryAttr = query ? ` data-query="${escapeHtml(query)}"` : '';
+
+    const matchMeta = query ? lastSearchMatchMeta.get(Number(canon.numero)) : null;
+    const isLatinMatch = Boolean(matchMeta && matchMeta.laMatch);
+    const isLatinOnly = Boolean(matchMeta && matchMeta.laMatch && !matchMeta.esMatch && !matchMeta.temasMatch && !matchMeta.numMatch);
+
+    let latinSnippetHtml = '';
+    if (query && isLatinMatch && typeof canon.texto_latin === 'string' && canon.texto_latin.trim() !== '') {
+      const excerpt = buildLatinExcerpt(canon.texto_latin, query);
+      latinSnippetHtml = `
+        <div class="search-latin-snippet">
+          <span class="search-latin-badge">${isLatinOnly ? 'Coincidencia en latín' : 'También en latín'}</span>
+          <span class="search-latin-excerpt">${highlightMatch(excerpt, query)}</span>
+        </div>
+      `;
+    }
 
     const temasList = Array.isArray(canon.temas) ? canon.temas : [];
     const tagsHtml = temasList.map(t =>
@@ -330,6 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ${buildLangTabsContainerHtml(canon)}
           </div>
           <div class="search-result-excerpt canon-texto"${queryAttr}>${bodyHtml}</div>
+          ${latinSnippetHtml}
           <button type="button" class="btn-copiar-cita" onclick="copiarCitaCanon(this)" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #f1f5f9; color: #1e293b; border-radius: 5px; font-size: 0.85em; border: 1px solid #cbd5e1; cursor: pointer;">📋 Copiar Cita</button>
           ${interpLinkHtml}
           ${tagsHtml ? `<div class="search-result-tags">${tagsHtml}</div>` : ''}
@@ -343,19 +382,23 @@ document.addEventListener('DOMContentLoaded', () => {
     bindLangTabs(containerEl);
 
     containerEl.querySelectorAll('.search-result-item').forEach(item => {
+      const openItemDetail = () => {
+        const num = parseInt(item.dataset.canon, 10);
+        const excerptEl = item.querySelector('.search-result-excerpt');
+        const fromQuery = excerptEl && excerptEl.dataset.query ? excerptEl.dataset.query : '';
+        if (typeof onBeforeOpenDetail === 'function') onBeforeOpenDetail();
+        showCanonDetail(num, fromQuery ? { searchQuery: fromQuery } : {});
+      };
+
       item.addEventListener('click', (e) => {
         if (e.target.closest('.lang-tabs-container') || e.target.closest('.btn-copiar-cita') || e.target.closest('.enlace-interpretacion')) return;
-        const num = parseInt(item.dataset.canon, 10);
-        if (typeof onBeforeOpenDetail === 'function') onBeforeOpenDetail();
-        showCanonDetail(num);
+        openItemDetail();
       });
       item.addEventListener('keydown', (e) => {
         if (e.target.closest('.lang-tabs-container')) return;
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          const num = parseInt(item.dataset.canon, 10);
-          if (typeof onBeforeOpenDetail === 'function') onBeforeOpenDetail();
-          showCanonDetail(num);
+          openItemDetail();
         }
       });
     });
@@ -717,7 +760,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return (canon && typeof canon[langObj.prop] === 'string') ? canon[langObj.prop] : '';
   }
 
-  function renderDetailBodyByMode(canon) {
+  function renderDetailBodyByMode(canon, options = {}) {
     const bodyEl = document.getElementById('canonDetailBody');
     const detailLangTabs = document.getElementById('canonDetailLangTabs');
     const modeSelector = document.getElementById('canonDetailModeSelector');
@@ -725,6 +768,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const prefs = getReaderPrefs();
     const mode = prefs.mode;
+    const searchQuery = options.searchQuery || '';
+    const matchMeta = searchQuery ? lastSearchMatchMeta.get(Number(canon.numero)) : null;
+    const isLatinOnlySearchMatch = Boolean(
+      matchMeta && matchMeta.laMatch && !matchMeta.esMatch && !matchMeta.temasMatch && !matchMeta.numMatch
+    );
 
     if (modeSelector) {
       modeSelector.querySelectorAll('.reader-mode-btn').forEach(btn => {
@@ -734,14 +782,18 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    // Determine effective language in Simple mode (auto-focus Latin when opened from a Latin-only search match)
+    const preferredSimpleObj = LANG_TABS.find(l => l.code === prefs.singleLang) || LANG_TABS[0];
+    let effectiveSimpleCode = hasValidLangText(canon, preferredSimpleObj.prop) ? preferredSimpleObj.code : 'es';
+    if (mode === 'simple' && isLatinOnlySearchMatch && hasValidLangText(canon, 'texto_latin')) {
+      effectiveSimpleCode = 'la';
+    }
+
     // Show single-language pills only in Simple mode
     if (detailLangTabs) {
       if (mode === 'simple') {
-        const activeCode = hasValidLangText(canon, (LANG_TABS.find(l => l.code === prefs.singleLang) || LANG_TABS[0]).prop)
-          ? prefs.singleLang
-          : 'es';
         detailLangTabs.style.display = '';
-        detailLangTabs.innerHTML = buildLangTabsButtonsHtml(canon, activeCode);
+        detailLangTabs.innerHTML = buildLangTabsButtonsHtml(canon, effectiveSimpleCode);
         bindLangTabs(detailLangTabs);
       } else {
         detailLangTabs.style.display = 'none';
@@ -750,6 +802,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     bodyEl.classList.remove('is-mode-simple', 'is-mode-dual', 'is-mode-multi');
+
+    const latinMatchNoteHtml = (searchQuery && matchMeta && matchMeta.laMatch)
+      ? `<div class="detail-latin-match-note">Coincidencia en latín para «<strong>${escapeHtml(searchQuery)}</strong>»</div>`
+      : '';
 
     if (mode === 'dual') {
       bodyEl.classList.add('is-mode-dual');
@@ -761,7 +817,16 @@ document.addEventListener('DOMContentLoaded', () => {
         `<option value="${l.code}"${l.code === selectedCode ? ' selected' : ''}>${l.label} — ${l.name}</option>`
       ).join('');
 
+      const renderDualColText = (code) => {
+        const raw = getCanonTextByCode(canon, code);
+        if (searchQuery && ((code === 'es' && matchMeta && matchMeta.esMatch) || (code === 'la' && matchMeta && matchMeta.laMatch))) {
+          return highlightMatch(raw, searchQuery);
+        }
+        return escapeHtml(raw);
+      };
+
       bodyEl.innerHTML = `
+        ${latinMatchNoteHtml}
         <div class="reader-dual-grid">
           <div class="reader-dual-col">
             <div class="reader-col-header">
@@ -770,7 +835,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${buildOptions(leftCode)}
               </select>
             </div>
-            <div class="reader-col-text" data-dual-text="left">${escapeHtml(getCanonTextByCode(canon, leftCode))}</div>
+            <div class="reader-col-text" data-dual-text="left">${renderDualColText(leftCode)}</div>
           </div>
           <div class="reader-dual-col">
             <div class="reader-col-header">
@@ -779,7 +844,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${buildOptions(rightCode)}
               </select>
             </div>
-            <div class="reader-col-text" data-dual-text="right">${escapeHtml(getCanonTextByCode(canon, rightCode))}</div>
+            <div class="reader-col-text" data-dual-text="right">${renderDualColText(rightCode)}</div>
           </div>
         </div>
       `;
@@ -808,16 +873,19 @@ document.addEventListener('DOMContentLoaded', () => {
         .filter(l => l && hasValidLangText(canon, l.prop));
 
       bodyEl.innerHTML = `
+        ${latinMatchNoteHtml}
         <div class="reader-multi-grid">
           ${multiOrder.map(l => {
             const isOfficialLatin = l.code === 'la';
+            const shouldHighlight = searchQuery && ((l.code === 'es' && matchMeta && matchMeta.esMatch) || (l.code === 'la' && matchMeta && matchMeta.laMatch));
+            const textHtml = shouldHighlight ? highlightMatch(canon[l.prop], searchQuery) : escapeHtml(canon[l.prop]);
             return `
               <div class="reader-multi-card${isOfficialLatin ? ' is-official-latin' : ''}">
                 <div class="reader-multi-header">
                   <span class="reader-lang-badge${isOfficialLatin ? ' is-official' : ''}">${l.label}</span>
                   <span class="reader-multi-name">${l.name}${isOfficialLatin ? ' · Texto oficial' : ''}</span>
                 </div>
-                <div class="reader-col-text">${escapeHtml(canon[l.prop])}</div>
+                <div class="reader-col-text">${textHtml}</div>
               </div>
             `;
           }).join('')}
@@ -828,9 +896,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Modo Simple (por defecto)
     bodyEl.classList.add('is-mode-simple');
-    const simpleLangObj = LANG_TABS.find(l => l.code === prefs.singleLang);
-    const activeProp = (simpleLangObj && hasValidLangText(canon, simpleLangObj.prop)) ? simpleLangObj.prop : 'texto';
-    bodyEl.textContent = canon[activeProp] || '';
+    const simpleLangObj = LANG_TABS.find(l => l.code === effectiveSimpleCode) || LANG_TABS[0];
+    const activeProp = hasValidLangText(canon, simpleLangObj.prop) ? simpleLangObj.prop : 'texto';
+    const simpleText = canon[activeProp] || '';
+    if (searchQuery && ((effectiveSimpleCode === 'la' && matchMeta && matchMeta.laMatch) || (effectiveSimpleCode === 'es' && matchMeta && matchMeta.esMatch))) {
+      bodyEl.innerHTML = `${latinMatchNoteHtml}${highlightMatch(simpleText, searchQuery)}`;
+    } else if (latinMatchNoteHtml) {
+      bodyEl.innerHTML = `${latinMatchNoteHtml}${escapeHtml(simpleText)}`;
+    } else {
+      bodyEl.textContent = simpleText;
+    }
   }
 
   // Bind mode selector buttons once
@@ -850,7 +925,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function showCanonDetail(numero) {
+  function showCanonDetail(numero, options = {}) {
     const canon = findCanon(numero);
     if (!canon) return;
 
@@ -880,7 +955,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Render canon body according to persisted Simple / Dual / Multilingüe mode
-    renderDetailBodyByMode(canon);
+    renderDetailBodyByMode(canon, options);
 
     // Interpretación Auténtica y Copiar Cita
     const interpContainer = document.getElementById('canonDetailInterp');
@@ -1005,6 +1080,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function searchCanones(query) {
+    lastSearchMatchMeta.clear();
     if (!dbData || !Array.isArray(dbData.canones)) return [];
     const rawTrimmed = String(query || '').trim();
     if (!rawTrimmed) return [];
@@ -1013,44 +1089,61 @@ document.addEventListener('DOMContentLoaded', () => {
     const numMatch = q.match(/^(?:canon\s+|can\.?\s*|c\.?\s*)?(\d+)$/);
     const exactNum = numMatch ? Number(numMatch[1]) : null;
 
-    const filtered = dbData.canones.filter(canon => {
-      if (!canon) return false;
+    const exactMatches = [];
+    const spanishMatches = [];
+    const latinOnlyMatches = [];
+
+    dbData.canones.forEach(canon => {
+      if (!canon) return;
 
       // 1. Exact match on canon.numero
       if (exactNum !== null && Number(canon.numero) === exactNum) {
-        return true;
+        lastSearchMatchMeta.set(Number(canon.numero), { numMatch: true, esMatch: false, temasMatch: false, laMatch: false });
+        exactMatches.push(canon);
+        return;
       }
 
       // If the user explicitly typed "canon 1331" / "can. 1331", only match exact canon.numero
       if (exactNum !== null && !/^\d+$/.test(rawTrimmed)) {
-        return false;
+        return;
       }
 
       // If the user typed a pure canon number (e.g. "1331"), avoid matching "§ 1" noise in text
       if (exactNum !== null && canonMap.has(exactNum)) {
-        return false;
+        return;
       }
 
-      // 2. Match against canon.texto (use pre-normalized index from Worker when available)
+      // 2. Match against canon.texto (Spanish content)
       const qTexto = canon._qTexto !== undefined
         ? canon._qTexto
         : (typeof canon.texto === 'string' ? normalizeStr(canon.texto) : '');
-      if (qTexto && qTexto.includes(q)) {
-        return true;
-      }
+      const esMatch = Boolean(qTexto && qTexto.includes(q));
 
       // 3. Match against canon.temas array
       const qTemas = Array.isArray(canon._qTemas)
         ? canon._qTemas
         : (Array.isArray(canon.temas) ? canon.temas.map(normalizeStr) : []);
-      if (qTemas.some(t => t.includes(q))) {
-        return true;
-      }
+      const temasMatch = qTemas.some(t => t.includes(q));
 
-      return false;
+      // 4. Match against canon.texto_latin
+      const qLatin = canon._qLatin !== undefined
+        ? canon._qLatin
+        : (typeof canon.texto_latin === 'string' ? normalizeStr(canon.texto_latin) : '');
+      const laMatch = Boolean(qLatin && qLatin.includes(q));
+
+      if (!esMatch && !temasMatch && !laMatch) return;
+
+      lastSearchMatchMeta.set(Number(canon.numero), { numMatch: false, esMatch, temasMatch, laMatch });
+
+      // Priority: direct Spanish/temas matches before Latin-only matches
+      if (esMatch || temasMatch) {
+        spanishMatches.push(canon);
+      } else {
+        latinOnlyMatches.push(canon);
+      }
     });
 
-    return filtered;
+    return [...exactMatches, ...spanishMatches, ...latinOnlyMatches];
   }
 
   function renderSearchResults(results, query) {

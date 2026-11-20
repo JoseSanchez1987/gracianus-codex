@@ -74,6 +74,7 @@ self.onmessage = async (e) => {
     db.canones.forEach((c) => {
       if (!c) return;
       c._qTexto = normalizeStr(c.texto);
+      c._qLatin = normalizeStr(c.texto_latin);
       c._qTemas = Array.isArray(c.temas) ? c.temas.map(normalizeStr) : [];
     });
 
