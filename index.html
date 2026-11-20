@@ -788,5 +788,15 @@
   <script src="./temas_data.js"></script>
   <script src="./script.js"></script>
   <script src="./pwa.js" defer></script>
+  <script>
+    window.addEventListener('load', () => {
+      const umami = document.createElement('script');
+      umami.src = 'https://joselinux-default-string.tail40fd36.ts.net/script.js';
+      umami.dataset.websiteId = 'a5cb6a91-11a5-4714-b358-9ba608830fcd';
+      umami.async = true;
+      umami.defer = true;
+      document.head.appendChild(umami);
+    });
+  </script>
 </body>
 </html>
